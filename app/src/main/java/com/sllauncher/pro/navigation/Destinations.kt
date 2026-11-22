@@ -22,3 +22,5 @@ import kotlinx.serialization.Serializable
 @Serializable data object CustomizationDestination
 @Serializable data object PrivacyDestination
 @Serializable data object AboutDestination
+@Serializable data object GesturesDestination
+@Serializable data object NewsSourcesDestination

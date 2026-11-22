@@ -31,6 +31,14 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- Bluetooth on/off state in Device info (Android 11 and older only). -->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <!-- Screen time (special access the user grants in Settings › Usage access). -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- Optional Do Not Disturb during focus sessions (special access the user grants). -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <!-- Applying SL's built-in soft wallpapers (normal permission, no prompt). -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <!-- Only apps signed with SL Launcher's key (the SL assistant app) can run launcher actions. -->
     <permission
@@ -159,6 +167,33 @@
             android:name=".assistant.AssistantBridgeService"
             android:exported="true"
             android:permission="com.sllauncher.pro.permission.EXECUTE_LAUNCHER_ACTIONS" />
+
+        <!-- Home-screen gestures: lock screen and notification shade. Off until the user enables it. -->
+        <service
+            android:name=".gestures.SLAccessibilityService"
+            android:exported="false"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service" />
+        </service>
+
+        <!-- "SL Today" home-screen widget: clock, date, next task, focus timer. -->
+        <receiver
+            android:name=".widgets.TodayWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_today_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_today_info" />
+        </receiver>
 
         <!-- Task reminders and focus-timer completion (sent only by SL's own alarms). -->
         <receiver android:name=".productivity.ReminderReceiver" android:exported="false" />

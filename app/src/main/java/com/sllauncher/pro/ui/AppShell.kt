@@ -36,6 +36,7 @@ import javax.inject.Singleton
 class AppShell @Inject constructor(
     private val notifications: NotificationRepository,
     private val bus: UiCommandBus,
+    private val apps: com.sllauncher.pro.data.apps.AppRepository,
 ) {
     val featureGraph: FeatureGraph = { nav ->
         val back: () -> Unit = { nav.popBackStack() }
@@ -63,9 +64,11 @@ class AppShell @Inject constructor(
     @Composable
     fun Overlays() {
         var assistantOpen by rememberSaveable { mutableStateOf(false) }
+        var focusAsk by remember { mutableStateOf<UiCommand.ConfirmFocusLaunch?>(null) }
         LaunchedEffect(Unit) {
             bus.commands.collect { command ->
                 when (command) {
+                    is UiCommand.ConfirmFocusLaunch -> focusAsk = command
                     UiCommand.OpenAssistant -> assistantOpen = true
                     is UiCommand.Navigate, UiCommand.CloseOverlays -> assistantOpen = false
                     else -> Unit
@@ -73,5 +76,18 @@ class AppShell @Inject constructor(
             }
         }
         AssistantOverlay(visible = assistantOpen, onDismiss = { assistantOpen = false })
+        focusAsk?.let { ask ->
+            com.sllauncher.core.designsystem.component.SLDialog(
+                title = "You're in a focus session",
+                text = "${ask.label} is one of your distracting apps. Open it anyway?",
+                confirmLabel = "Open anyway",
+                onConfirm = {
+                    focusAsk = null
+                    apps.launch(ask.key, force = true)
+                },
+                onDismissRequest = { focusAsk = null },
+                dismissLabel = "Stay focused",
+            )
+        }
     }
 }

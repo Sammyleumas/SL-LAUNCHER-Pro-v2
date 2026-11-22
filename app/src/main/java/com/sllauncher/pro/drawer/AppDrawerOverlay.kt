@@ -295,7 +295,7 @@ private fun AppGridWithIndex(state: DrawerUiState, onOpen: (AppEntry) -> Unit, o
             ) {
                 if (state.recents.isNotEmpty()) {
                     item(span = { GridItemSpan(maxLineSpan) }, key = "recent-header") {
-                        SLSectionHeader("Recent", Modifier.padding(8.dp))
+                        SLSectionHeader(if (state.recentsAreSuggestions) "Suggested for now" else "Recent", Modifier.padding(8.dp))
                     }
                     item(span = { GridItemSpan(maxLineSpan) }, key = "recent-row") {
                         LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {

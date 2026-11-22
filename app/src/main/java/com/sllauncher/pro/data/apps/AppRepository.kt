@@ -36,6 +36,9 @@ import javax.inject.Singleton
 
 private const val TAG = "AppRepository"
 
+/** App categories a focus session guards against. */
+private val DistractingCategories = setOf(AppCategory.Social, AppCategory.Games, AppCategory.Media)
+
 /**
  * Installed, launchable apps for every user profile on the device, kept up
  * to date through [LauncherApps.Callback]. Uses the launcher-intent
@@ -45,8 +48,15 @@ private const val TAG = "AppRepository"
 class AppRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
     private val appMetaDao: AppMetaDao,
+    private val appLaunchDao: com.sllauncher.pro.data.db.AppLaunchDao,
+    private val focusTimer: com.sllauncher.pro.productivity.FocusTimer,
+    private val settings: com.sllauncher.pro.data.settings.SettingsRepository,
+    private val bus: com.sllauncher.pro.common.UiCommandBus,
     @param:ApplicationScope private val scope: CoroutineScope,
 ) {
+    /** Launches from the last 30 days, for time-of-day suggestions. */
+    val launchLog: kotlinx.coroutines.flow.Flow<List<com.sllauncher.pro.data.db.AppLaunchEntity>> =
+        appLaunchDao.observeSince(System.currentTimeMillis() - 30L * 86_400_000L)
     private val launcherApps = context.getSystemService(LauncherApps::class.java)
     private val userManager = context.getSystemService(UserManager::class.java)
     private val ownComponent = "${context.packageName}/com.sllauncher.pro.MainActivity"
@@ -140,8 +150,16 @@ class AppRepository @Inject constructor(
         return launcherApps.resolveActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setComponent(key.component), user)
     }
 
-    /** Opens an app and records the launch for Recent/Most used. */
-    fun launch(key: AppKey, sourceBounds: Rect? = null): Boolean {
+    /**
+     * Opens an app and records the launch for Recent/Most used. During a
+     * focus session, social, games and media apps ask first (unless [force]).
+     */
+    fun launch(key: AppKey, sourceBounds: Rect? = null, force: Boolean = false): Boolean {
+        if (!force && isDistraction(key)) {
+            val label = entries.value.firstOrNull { it.app.key == key }?.app?.label ?: "this app"
+            bus.send(com.sllauncher.pro.common.UiCommand.ConfirmFocusLaunch(key, label))
+            return true
+        }
         val user = userForSerial(key.userSerial) ?: return false
         return try {
             launcherApps.startMainActivity(key.component, user, sourceBounds, ActivityOptions.makeBasic().toBundle())
@@ -157,13 +175,27 @@ class AppRepository @Inject constructor(
         }
     }
 
+    private fun isDistraction(key: AppKey): Boolean {
+        val session = focusTimer.session.value ?: return false
+        if (session.phase != com.sllauncher.pro.productivity.FocusPhase.Focus) return false
+        if (!settings.current.focusGuardDistractions) return false
+        val category = entries.value.firstOrNull { it.app.key == key }?.category ?: return false
+        return category in DistractingCategories
+    }
+
     private fun recordLaunch(key: AppKey) {
         scope.launch {
             val flat = key.flatten()
+            val now = System.currentTimeMillis()
             val meta = appMetaDao.get(flat) ?: AppMetaEntity(flat)
-            appMetaDao.upsert(meta.copy(launchCount = meta.launchCount + 1, lastLaunchedAt = System.currentTimeMillis()))
+            appMetaDao.upsert(meta.copy(launchCount = meta.launchCount + 1, lastLaunchedAt = now))
+            appLaunchDao.insert(com.sllauncher.pro.data.db.AppLaunchEntity(appKey = flat, at = now))
+            appLaunchDao.pruneBefore(now - 30L * 86_400_000L)
         }
     }
+
+    /** Clears launch history (Privacy › clear usage data). */
+    suspend fun clearLaunchHistory() = appLaunchDao.clear()
 
     fun openAppInfo(key: AppKey) {
         val user = userForSerial(key.userSerial) ?: return

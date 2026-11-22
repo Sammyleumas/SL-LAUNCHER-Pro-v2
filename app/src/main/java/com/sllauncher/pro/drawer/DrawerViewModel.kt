@@ -25,6 +25,8 @@ import javax.inject.Inject
 data class DrawerUiState(
     val apps: List<AppEntry> = emptyList(),
     val recents: List<AppEntry> = emptyList(),
+    /** True when [recents] are time-of-day suggestions rather than recently opened apps. */
+    val recentsAreSuggestions: Boolean = false,
     val filter: DrawerFilter = DrawerFilter.All,
     val query: String = "",
     val builtInCategories: List<AppCategory> = emptyList(),
@@ -46,20 +48,28 @@ class DrawerViewModel @Inject constructor(
     private val query = MutableStateFlow("")
 
     val uiState: StateFlow<DrawerUiState> = combine(
-        appRepository.entries,
+        combine(appRepository.entries, appRepository.launchLog) { e, log -> e to log },
         combine(filter, query) { f, q -> f to q },
         categoryDao.observeAll(),
         settingsRepository.settings,
         appRepository.loaded,
-    ) { entries, (f, q), customs, settings, loaded ->
+    ) { (entries, log), (f, q), customs, settings, loaded ->
         val hidden = settings.drawerHiddenCategories
+        val showTop = q.isBlank() && f == DrawerFilter.All
+        val suggested = if (showTop && settings.drawerShowSuggestions) {
+            val byKey = entries.filter { !it.hidden }.associateBy { it.app.key.flatten() }
+            suggestApps(log.map { it.appKey to it.at }, System.currentTimeMillis(), limit = 8).mapNotNull { byKey[it] }
+        } else {
+            emptyList()
+        }
         DrawerUiState(
             apps = filterApps(entries, f, q, settings.drawerSort),
-            recents = if (settings.drawerShowRecents && q.isBlank() && f == DrawerFilter.All) {
-                filterApps(entries, DrawerFilter.Recent, "", settings.drawerSort, recentLimit = 8)
-            } else {
-                emptyList()
+            recents = when {
+                suggested.size >= 3 -> suggested
+                showTop && settings.drawerShowRecents -> filterApps(entries, DrawerFilter.Recent, "", settings.drawerSort, recentLimit = 8)
+                else -> emptyList()
             },
+            recentsAreSuggestions = suggested.size >= 3,
             filter = f,
             query = q,
             builtInCategories = nonEmptyCategories(entries).filter { it.name !in hidden },

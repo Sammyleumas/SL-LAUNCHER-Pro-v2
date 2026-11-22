@@ -359,6 +359,20 @@ private fun NowPlayingPane(state: MusicUiState, viewModel: MusicViewModel, conte
             }
         }
         item {
+            val sleepAt by viewModel.controller.sleepAt.collectAsStateWithLifecycle()
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    sleepAt?.let { "Sleep timer: stops at " + android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it)) } ?: "Sleep timer",
+                    style = SLTheme.typography.label,
+                    color = SLTheme.colors.textSecondary,
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    SLChip("Off", sleepAt == null, { viewModel.controller.setSleepTimer(null) })
+                    listOf(15, 30, 60).forEach { m -> SLChip("$m min", false, { viewModel.controller.setSleepTimer(m) }) }
+                }
+            }
+        }
+        item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SLButton("Audio output", { context.startSafely(SystemIntents.bluetooth()) }, style = SLButtonStyle.Secondary)
                 SLButton("Equalizer", {

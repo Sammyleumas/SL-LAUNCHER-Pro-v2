@@ -8,8 +8,11 @@ import java.util.Locale
 /** News categories shown as tabs, in order. "For You" is computed, not fetched. */
 val NewsCategories = listOf(
     "For You", "Nigeria", "World", "Technology", "Business", "Sports",
-    "Entertainment", "Education", "Science", "Health", "Lifestyle",
+    "Entertainment", "Education", "Science", "Health", "Lifestyle", MyFeedsCategory,
 )
+
+/** Category for feeds the user added by URL. */
+const val MyFeedsCategory = "My feeds"
 
 /**
  * Plain text from a feed's HTML description, capped at [maxLength] so SL

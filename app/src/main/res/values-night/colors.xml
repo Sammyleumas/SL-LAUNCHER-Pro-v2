@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sl_background">#FF23262D</color>
+    <color name="sl_widget_surface">#F223262D</color>
+    <color name="sl_widget_text">#FFE8EAF0</color>
+    <color name="sl_widget_text_secondary">#FFA9AFBF</color>
+    <color name="sl_widget_edge">#FF7A8092</color>
+    <color name="sl_widget_accent">#FF8FA2FF</color>
+</resources>

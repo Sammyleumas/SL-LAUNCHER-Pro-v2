@@ -46,6 +46,7 @@ import com.sllauncher.core.designsystem.component.SLBlock
 import com.sllauncher.core.designsystem.component.SLButton
 import com.sllauncher.core.designsystem.component.SLButtonStyle
 import com.sllauncher.core.designsystem.component.SLDialog
+import com.sllauncher.core.designsystem.component.SLNavigationRow
 import com.sllauncher.core.designsystem.component.SLSectionHeader
 import com.sllauncher.core.designsystem.component.SLSwitchRow
 import com.sllauncher.core.designsystem.theme.SLTheme
@@ -76,6 +77,21 @@ class PrivacyViewModel @Inject constructor(
 
     fun update(transform: (LauncherSettings) -> LauncherSettings) = viewModelScope.launch { settings.update(transform) }
     fun unhide(entry: AppEntry) = viewModelScope.launch { apps.updateMeta(entry.app.key) { it.copy(hidden = false) } }
+    fun clearSuggestions() = viewModelScope.launch { apps.clearLaunchHistory(); bus.send(UiCommand.ShowMessage("App suggestions reset.")) }
+
+    /** Android's lock-screen notification settings (where content can be hidden on the lock screen). */
+    fun openLockScreenSettings() {
+        val intents = listOf(
+            android.content.Intent("android.settings.LOCK_SCREEN_SETTINGS"),
+            android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_SETTINGS),
+            android.content.Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
+        )
+        for (intent in intents) {
+            val ok = runCatching { context.startActivity(intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
+            if (ok) return
+        }
+    }
+
     fun clearSearchHistory() = viewModelScope.launch { searchHistory.clear(); bus.send(UiCommand.ShowMessage("Search history cleared.")) }
     fun clearNotificationHistory() = viewModelScope.launch { notificationHistory.clear(); bus.send(UiCommand.ShowMessage("Notification history cleared.")) }
 
@@ -174,10 +190,16 @@ fun PrivacyRoute(onBack: () -> Unit, viewModel: PrivacyViewModel = hiltViewModel
             SLSwitchRow("Hide notification content", s.hideNotificationContent, { on -> viewModel.update { it.copy(hideNotificationContent = on) } }, subtitle = "Island and notification center show only app names")
             SLSwitchRow("Keep notification history", s.notificationHistoryEnabled, { on -> viewModel.update { it.copy(notificationHistoryEnabled = on) } }, subtitle = "Last 7 days, on this phone only")
             SLButton("Clear notification history", { viewModel.clearNotificationHistory() }, style = SLButtonStyle.Secondary)
+            SLNavigationRow(
+                "Lock screen notifications",
+                { viewModel.openLockScreenSettings() },
+                subtitle = "Hide message content on the lock screen (Android setting)",
+            )
 
             SLSectionHeader("Search")
             SLSwitchRow("Remember searches", s.searchHistoryEnabled, { on -> viewModel.update { it.copy(searchHistoryEnabled = on) } })
             SLButton("Clear search history", { viewModel.clearSearchHistory() }, style = SLButtonStyle.Secondary)
+            SLButton("Reset app suggestions", { viewModel.clearSuggestions() }, style = SLButtonStyle.Secondary)
 
             SLSectionHeader("Hidden apps")
             Text(

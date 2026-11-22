@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
-enum class ProductivityTab(val label: String) { Today("Today"), Tasks("Tasks"), Notes("Notes"), Focus("Focus"), Countdowns("Countdowns"), Contacts("Contacts") }
+enum class ProductivityTab(val label: String) { Today("Today"), Tasks("Tasks"), Habits("Habits"), Notes("Notes"), Focus("Focus"), ScreenTime("Screen time"), Countdowns("Countdowns"), Contacts("Contacts") }
 
 data class ProductivityState(
     val notes: List<NoteEntity> = emptyList(),
@@ -209,6 +209,8 @@ fun ProductivityRoute(onBack: () -> Unit, viewModel: ProductivityViewModel = hil
                     SLButton("Pomodoro (25 + 5)", { ensureNotifications(); viewModel.startFocus(25, pomodoro = true) })
                 }
             }
+            ProductivityTab.Habits -> HabitsTab()
+            ProductivityTab.ScreenTime -> ScreenTimeTab()
             ProductivityTab.Countdowns -> {
                 SLButton("New countdown", { addingCountdown = true }, modifier = Modifier.padding(12.dp))
                 if (state.countdowns.isEmpty()) SLEmptyState("No countdowns", "Count down to exams, birthdays or trips.")
@@ -264,7 +266,7 @@ private fun TaskRow(t: TaskEntity, context: Context, viewModel: ProductivityView
         SLSwitch(checked = t.done, onCheckedChange = { viewModel.toggleTask(t) })
         Column(Modifier.weight(1f)) {
             Text(t.title, style = SLTheme.typography.body, color = if (t.done) SLTheme.colors.textSecondary else SLTheme.colors.textPrimary, textDecoration = if (t.done) TextDecoration.LineThrough else null)
-            t.dueAt?.let { Text(DateUtils.formatDateTime(context, it, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME) + if (t.remind) " · reminder" else "", style = SLTheme.typography.caption, color = SLTheme.colors.textSecondary) }
+            t.dueAt?.let { Text(DateUtils.formatDateTime(context, it, DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME) + (if (t.remind) " · reminder" else "") + (if (t.repeat != 0) " · repeats" else ""), style = SLTheme.typography.caption, color = SLTheme.colors.textSecondary) }
         }
         SLButton("Edit", onEdit, style = SLButtonStyle.Ghost)
     }
@@ -306,6 +308,7 @@ private fun TaskEditor(task: TaskEntity, context: Context, onSave: (TaskEntity) 
     var title by remember { mutableStateOf(task.title) }
     var due by remember { mutableStateOf(task.dueAt) }
     var remind by remember { mutableStateOf(task.remind) }
+    var repeat by remember { mutableStateOf(task.repeat) }
     SLBottomSheet(onDismissRequest = onDismiss, title = if (task.id == 0L) "New task" else "Edit task") {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             SLSearchField(query = title, onQueryChange = { title = it }, placeholder = "What needs doing?")
@@ -315,8 +318,16 @@ private fun TaskEditor(task: TaskEntity, context: Context, onSave: (TaskEntity) 
                 if (due != null) SLButton("Clear", { due = null; remind = false }, style = SLButtonStyle.Ghost)
             }
             SLSwitchRow(title = "Remind me", subtitle = "Notification at the due time (within about a minute)", checked = remind, enabled = due != null, onCheckedChange = { remind = it })
+            if (due != null) {
+                Text("Repeat", style = SLTheme.typography.label, color = SLTheme.colors.textSecondary)
+                com.sllauncher.core.designsystem.component.SLSegmentedControl(
+                    options = listOf("Never", "Daily", "Weekly", "Weekdays").map { com.sllauncher.core.designsystem.component.SLSegment(it) },
+                    selectedIndex = repeat,
+                    onSelect = { repeat = it },
+                )
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SLButton("Save", { onSave(task.copy(title = title.trim(), dueAt = due, remind = remind && due != null)) }, enabled = title.isNotBlank())
+                SLButton("Save", { onSave(task.copy(title = title.trim(), dueAt = due, remind = remind && due != null, repeat = if (due != null) repeat else 0)) }, enabled = title.isNotBlank())
                 if (task.id != 0L) SLButton("Delete", onDelete, style = SLButtonStyle.Destructive)
             }
         }

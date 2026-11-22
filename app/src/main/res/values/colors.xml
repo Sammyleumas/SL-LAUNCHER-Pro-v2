@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Only colours needed by XML resources (window, launcher icon). UI colours live in SLTheme. -->
-    <color name="sl_background">#FF090909</color>
-    <color name="sl_accent">#FFFFD400</color>
+    <!-- Only colours needed by XML resources (window, launcher icon, widget). UI colours live in SLTheme. -->
+    <color name="sl_background">#FFE6E9EF</color>
+    <color name="sl_accent">#FF3A55D9</color>
+    <color name="sl_widget_surface">#F2E6E9EF</color>
+    <color name="sl_widget_text">#FF2D3142</color>
+    <color name="sl_widget_text_secondary">#FF4A5068</color>
+    <color name="sl_widget_edge">#FF7A8092</color>
+    <color name="sl_widget_accent">#FF3A55D9</color>
 </resources>

@@ -9,6 +9,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -27,6 +28,7 @@ class CurrentArticleHolder @Inject constructor() {
 class NewsRepository @Inject constructor(
     private val dao: ArticleDao,
     private val provider: NewsProvider,
+    private val settings: com.sllauncher.pro.data.settings.SettingsRepository,
 ) {
     private val mutex = Mutex()
     private val _lastRefresh = MutableStateFlow<RefreshReport?>(null)
@@ -39,7 +41,8 @@ class NewsRepository @Inject constructor(
     /** Fetches [categories] in parallel; one failing feed never blocks the others. */
     suspend fun refresh(categories: Set<String>): RefreshReport = mutex.withLock {
         val now = System.currentTimeMillis()
-        val feeds = DefaultNewsFeeds.filter { it.category in categories || categories.isEmpty() }
+        val custom = settings.settings.first().customFeeds.map { NewsFeed(it.name, MyFeedsCategory, it.url) }
+        val feeds = DefaultNewsFeeds.filter { it.category in categories || categories.isEmpty() } + custom
         val results = coroutineScope {
             feeds.map { feed ->
                 async {

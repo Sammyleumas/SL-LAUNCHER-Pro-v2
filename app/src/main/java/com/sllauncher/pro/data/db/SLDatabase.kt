@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 /**
- * SL Launcher's on-device database. Everything here stays on the phone.
+ * SL Launcher Pro's on-device database. Everything here stays on the phone.
  *
  * Version 1 is the first released schema; any later change must add a
  * Migration (schemas are exported to app/schemas for verification).
@@ -24,6 +24,9 @@ import androidx.room.RoomDatabase
         TrackStatsEntity::class,
         NotificationHistoryEntity::class,
         ProfileEntity::class,
+        AppLaunchEntity::class,
+        HabitEntity::class,
+        HabitCheckEntity::class,
     ],
     version = 1,
     exportSchema = true,
@@ -40,4 +43,6 @@ abstract class SLDatabase : RoomDatabase() {
     abstract fun musicDao(): MusicDao
     abstract fun notificationHistoryDao(): NotificationHistoryDao
     abstract fun profileDao(): ProfileDao
+    abstract fun appLaunchDao(): AppLaunchDao
+    abstract fun habitDao(): HabitDao
 }

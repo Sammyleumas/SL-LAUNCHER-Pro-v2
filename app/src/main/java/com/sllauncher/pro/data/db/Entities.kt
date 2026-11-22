@@ -91,6 +91,37 @@ data class TaskEntity(
     /** When set, a reminder notification is scheduled for [dueAt]. */
     val remind: Boolean = false,
     val createdAt: Long,
+    /** [TaskRepeat] constant. A repeating task moves to its next date when ticked off. */
+    val repeat: Int = TaskRepeat.NONE,
+)
+
+object TaskRepeat {
+    const val NONE = 0
+    const val DAILY = 1
+    const val WEEKLY = 2
+    const val WEEKDAYS = 3
+}
+
+/** One app launch from SL, kept 30 days, used only to suggest apps for the time of day. */
+@Entity(tableName = "app_launches", indices = [Index("at")])
+data class AppLaunchEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val appKey: String,
+    val at: Long,
+)
+
+@Entity(tableName = "habits")
+data class HabitEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val createdAt: Long,
+)
+
+/** A habit ticked off on [epochDay] (days since 1970-01-01 in the phone's time zone). */
+@Entity(tableName = "habit_checks", primaryKeys = ["habitId", "epochDay"], indices = [Index("habitId")])
+data class HabitCheckEntity(
+    val habitId: Long,
+    val epochDay: Long,
 )
 
 @Entity(tableName = "countdowns")

@@ -13,6 +13,7 @@ import com.sllauncher.pro.data.db.NoteDao
 import com.sllauncher.pro.data.db.NoteEntity
 import com.sllauncher.pro.data.db.TaskDao
 import com.sllauncher.pro.data.db.TaskEntity
+import com.sllauncher.pro.data.db.TaskRepeat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -47,14 +48,23 @@ class ProductivityRepository @Inject constructor(
         } else {
             ReminderReceiver.cancelTask(context, id)
         }
+        com.sllauncher.pro.widgets.TodayWidgetProvider.refresh(context)
         return id
     }
 
-    suspend fun setDone(task: TaskEntity, done: Boolean) = saveTask(task.copy(done = done))
+    /** Ticking off a repeating task moves it to its next date instead of finishing it. */
+    suspend fun setDone(task: TaskEntity, done: Boolean): Long {
+        val due = task.dueAt
+        if (done && task.repeat != TaskRepeat.NONE && due != null) {
+            return saveTask(task.copy(dueAt = nextOccurrence(due, task.repeat, System.currentTimeMillis())))
+        }
+        return saveTask(task.copy(done = done))
+    }
 
     suspend fun deleteTask(task: TaskEntity) {
         ReminderReceiver.cancelTask(context, task.id)
         tasks.delete(task)
+        com.sllauncher.pro.widgets.TodayWidgetProvider.refresh(context)
     }
 
     suspend fun saveCountdown(countdown: CountdownEntity) = countdowns.upsert(countdown)
@@ -106,6 +116,27 @@ class ProductivityRepository @Inject constructor(
         }
         out.distinctBy { it.id }.take(12)
     }
+}
+
+/**
+ * The next due time of a repeating task after it is ticked off: the same
+ * time of day, moved forward by the repeat rule until it is after [now].
+ */
+fun nextOccurrence(dueAt: Long, repeat: Int, now: Long, zone: ZoneId = ZoneId.systemDefault()): Long {
+    var next = java.time.Instant.ofEpochMilli(dueAt).atZone(zone)
+    do {
+        next = when (repeat) {
+            TaskRepeat.DAILY -> next.plusDays(1)
+            TaskRepeat.WEEKLY -> next.plusWeeks(1)
+            TaskRepeat.WEEKDAYS -> {
+                var d = next.plusDays(1)
+                while (d.dayOfWeek == java.time.DayOfWeek.SATURDAY || d.dayOfWeek == java.time.DayOfWeek.SUNDAY) d = d.plusDays(1)
+                d
+            }
+            else -> return dueAt
+        }
+    } while (next.toInstant().toEpochMilli() <= now)
+    return next.toInstant().toEpochMilli()
 }
 
 /** Whole days from today until [targetAt] (negative once passed). */

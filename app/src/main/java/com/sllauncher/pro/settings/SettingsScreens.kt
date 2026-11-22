@@ -65,6 +65,8 @@ fun NavGraphBuilder.settingsGraph(nav: NavHostController) {
     composable<PrivacyDestination> { PrivacyRoute(onBack = back) }
     composable<AssistantDestination> { AssistantSettingsRoute(onBack = back) }
     composable<AboutDestination> { AboutRoute(onBack = back) }
+    composable<com.sllauncher.pro.navigation.GesturesDestination> { GesturesRoute(onBack = back) }
+    composable<com.sllauncher.pro.navigation.NewsSourcesDestination> { NewsSourcesRoute(onBack = back) }
 }
 
 @HiltViewModel
@@ -86,10 +88,12 @@ fun SettingsHubRoute(onBack: () -> Unit, onNavigate: (Any) -> Unit) {
         SLNavigationRow("Default home app", { onNavigate(LauncherSetupDestination) })
         SLNavigationRow("Quick settings", { onNavigate(QuickSettingsDestination) })
         SLNavigationRow("Device info", { onNavigate(DeviceInfoDestination) })
+        SLNavigationRow("Gestures and focus", { onNavigate(com.sllauncher.pro.navigation.GesturesDestination) }, subtitle = "Double-tap to lock, swipe down, focus sessions")
         SLSectionHeader("Features", Modifier.padding(16.dp, 12.dp))
         SLNavigationRow("SL assistant", { onNavigate(AssistantDestination) })
         SLNavigationRow("Notifications", { onNavigate(NotificationCenterDestination) })
         SLNavigationRow("News", { onNavigate(NewsDestination) })
+        SLNavigationRow("News sources", { onNavigate(com.sllauncher.pro.navigation.NewsSourcesDestination) }, subtitle = "Add your own RSS feeds")
         SLNavigationRow("Music", { onNavigate(MusicDestination) })
         SLNavigationRow("Notes, tasks and focus", { onNavigate(ProductivityDestination) })
         SLSectionHeader("You", Modifier.padding(16.dp, 12.dp))

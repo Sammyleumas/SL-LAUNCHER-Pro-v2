@@ -85,13 +85,16 @@ fun HomePageGrid(
     movingItemId: Long?,
     onPlaceMoving: (cell: Int) -> Unit,
     onEmptyLongPress: () -> Unit,
+    onEmptyDoubleTap: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentDoubleTap by androidx.compose.runtime.rememberUpdatedState(onEmptyDoubleTap)
+    val currentLongPress by androidx.compose.runtime.rememberUpdatedState(onEmptyLongPress)
     val density = LocalDensity.current
     BoxWithConstraints(
         modifier
             .fillMaxSize()
-            .pointerInput(Unit) { detectTapGestures(onLongPress = { onEmptyLongPress() }) },
+            .pointerInput(Unit) { detectTapGestures(onLongPress = { currentLongPress() }, onDoubleTap = { currentDoubleTap() }) },
     ) {
         val cellW = maxWidth / grid.columns
         val cellH = maxHeight / grid.rows

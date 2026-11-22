@@ -34,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import com.sllauncher.pro.data.settings.GestureAction
+import com.sllauncher.pro.gestures.SLAccessibilityService
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -106,6 +108,27 @@ fun HomeRoute(
         onPauseOrDispose { }
     }
 
+    fun runGesture(action: GestureAction) {
+        when (action) {
+            GestureAction.None -> Unit
+            GestureAction.LockScreen -> if (!SLAccessibilityService.lockScreen()) {
+                viewModel.showMessage(
+                    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
+                        "Double-tap to lock needs Android 9 or newer."
+                    } else {
+                        "Turn on \"SL Launcher Pro gestures\" in Accessibility to lock with a double-tap."
+                    },
+                )
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) SLAccessibilityService.openSettings(context)
+            }
+            GestureAction.Notifications -> if (!SLAccessibilityService.openNotificationShade()) onNavigate(NotificationCenterDestination)
+            GestureAction.NotificationCenter -> onNavigate(NotificationCenterDestination)
+            GestureAction.Search -> { searchSeed = ""; overlay = Overlay.Search }
+            GestureAction.Assistant -> viewModel.openAssistant()
+            GestureAction.Drawer -> { drawerView = DrawerView.All; overlay = Overlay.Drawer }
+        }
+    }
+
     // Commands from the assistant, search or notifications.
     LaunchedEffect(commands) {
         commands?.collect { command ->
@@ -164,8 +187,9 @@ fun HomeRoute(
             movingItemId = null
         },
         onEmptyLongPress = { homeMenu = true },
+        onEmptyDoubleTap = { runGesture(state.settings.gestureDoubleTap) },
         onSwipeUp = { drawerView = DrawerView.All; overlay = Overlay.Drawer },
-        onSwipeDown = { onNavigate(NotificationCenterDestination) },
+        onSwipeDown = { runGesture(state.settings.gestureSwipeDown) },
         onOpenSearch = { searchSeed = ""; overlay = Overlay.Search },
         onOpenAssistant = viewModel::openAssistant,
         onOpenLauncherSetup = onOpenLauncherSetup,
@@ -237,6 +261,7 @@ private fun HomeScreen(
     movingItemId: Long?,
     onPlaceMoving: (page: Int, cell: Int) -> Unit,
     onEmptyLongPress: () -> Unit,
+    onEmptyDoubleTap: () -> Unit,
     onSwipeUp: () -> Unit,
     onSwipeDown: () -> Unit,
     onOpenSearch: () -> Unit,
@@ -246,6 +271,8 @@ private fun HomeScreen(
     val settings = state.settings
     val pagerState = rememberPagerState { state.pageCount }
     var dragTotal by remember { mutableStateOf(0f) }
+    val currentSwipeUp by androidx.compose.runtime.rememberUpdatedState(onSwipeUp)
+    val currentSwipeDown by androidx.compose.runtime.rememberUpdatedState(onSwipeDown)
 
     // The window theme draws the system wallpaper behind this screen.
     Column(
@@ -257,8 +284,8 @@ private fun HomeScreen(
                     onDragStart = { dragTotal = 0f },
                     onDragEnd = {
                         when {
-                            dragTotal < -120f -> onSwipeUp()
-                            dragTotal > 160f -> onSwipeDown()
+                            dragTotal < -120f -> currentSwipeUp()
+                            dragTotal > 160f -> currentSwipeDown()
                         }
                     },
                 ) { _, amount -> dragTotal += amount }
@@ -286,6 +313,7 @@ private fun HomeScreen(
                     movingItemId = movingItemId,
                     onPlaceMoving = { cell -> onPlaceMoving(page, cell) },
                     onEmptyLongPress = onEmptyLongPress,
+                    onEmptyDoubleTap = onEmptyDoubleTap,
                     modifier = Modifier.weight(1f),
                 )
             }

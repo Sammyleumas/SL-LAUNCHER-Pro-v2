@@ -95,6 +95,14 @@ class MainActivity : ComponentActivity() {
                 reduceMotion = if (current.lowPerformanceMode) true else null,
                 softShadows = !current.lowPerformanceMode,
             ) {
+                // Status and navigation bar icons follow the soft theme: dark icons on the light theme.
+                val darkTheme = com.sllauncher.core.designsystem.theme.SLTheme.colors.isDark
+                androidx.compose.runtime.LaunchedEffect(darkTheme) {
+                    enableEdgeToEdge(
+                        statusBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT) { darkTheme },
+                        navigationBarStyle = SystemBarStyle.auto(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT) { darkTheme },
+                    )
+                }
                 val navController = rememberNavController()
                 val snackbar = remember { SnackbarHostState() }
                 val startOnboarding = remember { !current.onboardingComplete }

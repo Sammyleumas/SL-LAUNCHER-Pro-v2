@@ -238,6 +238,45 @@ interface NotificationHistoryDao {
 }
 
 @Dao
+interface AppLaunchDao {
+    @Insert
+    suspend fun insert(launch: AppLaunchEntity)
+
+    @Query("SELECT * FROM app_launches WHERE at >= :since")
+    fun observeSince(since: Long): Flow<List<AppLaunchEntity>>
+
+    @Query("DELETE FROM app_launches WHERE at < :before")
+    suspend fun pruneBefore(before: Long)
+
+    @Query("DELETE FROM app_launches")
+    suspend fun clear()
+}
+
+@Dao
+interface HabitDao {
+    @Query("SELECT * FROM habits ORDER BY createdAt")
+    fun observeHabits(): Flow<List<HabitEntity>>
+
+    @Query("SELECT * FROM habit_checks WHERE epochDay >= :fromDay")
+    fun observeChecksSince(fromDay: Long): Flow<List<HabitCheckEntity>>
+
+    @Insert
+    suspend fun insert(habit: HabitEntity): Long
+
+    @Query("DELETE FROM habits WHERE id = :id")
+    suspend fun deleteHabit(id: Long)
+
+    @Query("DELETE FROM habit_checks WHERE habitId = :id")
+    suspend fun deleteChecks(id: Long)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun check(check: HabitCheckEntity)
+
+    @Delete
+    suspend fun uncheck(check: HabitCheckEntity)
+}
+
+@Dao
 interface ProfileDao {
     @Query("SELECT * FROM profiles ORDER BY name")
     fun observeAll(): Flow<List<ProfileEntity>>

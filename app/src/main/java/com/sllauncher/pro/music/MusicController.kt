@@ -102,6 +102,27 @@ class MusicController @Inject constructor(
         }
     }
 
+    private var sleepJob: kotlinx.coroutines.Job? = null
+    private val _sleepAt = MutableStateFlow<Long?>(null)
+
+    /** Wall-clock time the sleep timer pauses playback, or null when off. */
+    val sleepAt: StateFlow<Long?> = _sleepAt.asStateFlow()
+
+    /** Pauses playback after [minutes]; null turns the sleep timer off. */
+    fun setSleepTimer(minutes: Int?) {
+        sleepJob?.cancel()
+        if (minutes == null) {
+            _sleepAt.value = null
+            return
+        }
+        _sleepAt.value = System.currentTimeMillis() + minutes * 60_000L
+        sleepJob = scope.launch(kotlinx.coroutines.Dispatchers.Main) {
+            kotlinx.coroutines.delay(minutes * 60_000L)
+            controller?.pause()
+            _sleepAt.value = null
+        }
+    }
+
     /** Current position; read on demand (the UI polls while visible). */
     fun positionMs(): Long = controller?.currentPosition ?: 0L
 

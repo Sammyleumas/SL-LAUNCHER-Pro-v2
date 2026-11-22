@@ -62,4 +62,6 @@ object DataModule {
     @Provides fun musicDao(db: SLDatabase) = db.musicDao()
     @Provides fun notificationHistoryDao(db: SLDatabase) = db.notificationHistoryDao()
     @Provides fun profileDao(db: SLDatabase) = db.profileDao()
+    @Provides fun appLaunchDao(db: SLDatabase) = db.appLaunchDao()
+    @Provides fun habitDao(db: SLDatabase) = db.habitDao()
 }

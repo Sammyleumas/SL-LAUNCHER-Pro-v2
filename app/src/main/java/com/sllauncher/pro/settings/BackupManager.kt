@@ -25,7 +25,7 @@ const val BACKUP_VERSION = 1
 @Serializable data class AppMetaDto(val appKey: String, val hidden: Boolean, val favorite: Boolean, val categoryOverride: String? = null)
 @Serializable data class CategoryDto(val id: Long, val name: String, val position: Int)
 @Serializable data class NoteDto(val title: String, val body: String, val pinned: Boolean, val updatedAt: Long)
-@Serializable data class TaskDto(val title: String, val done: Boolean, val dueAt: Long? = null, val remind: Boolean = false, val createdAt: Long)
+@Serializable data class TaskDto(val title: String, val done: Boolean, val dueAt: Long? = null, val remind: Boolean = false, val createdAt: Long, val repeat: Int = 0)
 @Serializable data class CountdownDto(val title: String, val targetAt: Long)
 @Serializable data class ProfileDto(val name: String, val settingsJson: String)
 
@@ -84,7 +84,7 @@ class BackupManager @Inject constructor(
             },
             categories = db.categoryDao().getAll().map { CategoryDto(it.id, it.name, it.position) },
             notes = db.noteDao().getAll().map { NoteDto(it.title, it.body, it.pinned, it.updatedAt) },
-            tasks = db.taskDao().getAll().map { TaskDto(it.title, it.done, it.dueAt, it.remind, it.createdAt) },
+            tasks = db.taskDao().getAll().map { TaskDto(it.title, it.done, it.dueAt, it.remind, it.createdAt, it.repeat) },
             countdowns = db.countdownDao().observeAll().first().map { CountdownDto(it.title, it.targetAt) },
             profiles = db.profileDao().observeAll().first().filter { !it.name.startsWith("__") }.map { ProfileDto(it.name, it.settingsJson) },
         )
@@ -102,7 +102,7 @@ class BackupManager @Inject constructor(
             db.categoryDao().clear()
             db.categoryDao().insertAll(backup.categories.map { CustomCategoryEntity(it.id, it.name, it.position) })
             db.noteDao().insertAll(backup.notes.map { NoteEntity(title = it.title, body = it.body, pinned = it.pinned, updatedAt = it.updatedAt) })
-            db.taskDao().insertAll(backup.tasks.map { TaskEntity(title = it.title, done = it.done, dueAt = it.dueAt, remind = false, createdAt = it.createdAt) })
+            db.taskDao().insertAll(backup.tasks.map { TaskEntity(title = it.title, done = it.done, dueAt = it.dueAt, remind = false, createdAt = it.createdAt, repeat = it.repeat) })
             backup.countdowns.forEach { db.countdownDao().upsert(CountdownEntity(title = it.title, targetAt = it.targetAt)) }
             backup.profiles.forEach { db.profileDao().upsert(ProfileEntity(it.name, it.settingsJson, System.currentTimeMillis())) }
         }

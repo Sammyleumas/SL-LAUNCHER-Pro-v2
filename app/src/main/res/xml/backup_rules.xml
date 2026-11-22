@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 and lower backup rules. Kept in sync with data_extraction_rules.xml. -->
+<!-- Android 11 and lower Auto Backup rules. Kept in sync with data_extraction_rules.xml.
+     Settings, home layout, notes, tasks, habits and playlists go to the user's own
+     Google account backup and come back on a new phone. SL runs no server. -->
 <full-backup-content>
     <include domain="sharedpref" path="." />
     <include domain="file" path="datastore/" />
+    <include domain="database" path="." />
 </full-backup-content>

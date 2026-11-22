@@ -18,6 +18,8 @@ sealed interface UiCommand {
     /** A type-safe navigation route object from `navigation/Destinations.kt`. */
     data class Navigate(val route: Any) : UiCommand
     data class ShowMessage(val text: String) : UiCommand
+    /** A distracting app was opened during a focus session; ask before opening it. */
+    data class ConfirmFocusLaunch(val key: com.sllauncher.pro.data.apps.AppKey, val label: String) : UiCommand
 }
 
 @Singleton

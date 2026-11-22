@@ -29,6 +29,21 @@ enum class DrawerSort { Name, MostUsed, RecentlyInstalled }
 
 enum class IslandPosition { Center, Start }
 
+/** What a home-screen gesture does. */
+enum class GestureAction(val label: String) {
+    None("Nothing"),
+    LockScreen("Lock the screen"),
+    Notifications("Open the notification shade"),
+    NotificationCenter("Open SL notifications"),
+    Search("Open search"),
+    Assistant("Open the SL assistant"),
+    Drawer("Open the app drawer"),
+}
+
+/** A news feed the user added by URL. Shown under "My feeds". */
+@Serializable
+data class CustomFeed(val name: String, val url: String)
+
 /**
  * Every user preference in one versioned document. Stored as JSON so it can
  * be backed up, exported and saved as a customization profile as a unit.
@@ -103,4 +118,22 @@ data class LauncherSettings(
 
     // Profiles
     val activeProfile: String? = null,
+
+    // Gestures (v2)
+    val gestureDoubleTap: GestureAction = GestureAction.LockScreen,
+    val gestureSwipeDown: GestureAction = GestureAction.Notifications,
+
+    // News (v2)
+    val customFeeds: List<CustomFeed> = emptyList(),
+
+    // Focus (v2)
+    /** Turns on Do Not Disturb (priority only) while a focus session runs. */
+    val focusDoNotDisturb: Boolean = false,
+    /** Asks before opening social, games and media apps during a focus session. */
+    val focusGuardDistractions: Boolean = true,
+
+    // Drawer suggestions and wallpaper (v2)
+    val drawerShowSuggestions: Boolean = true,
+    /** Rotates SL's built-in soft wallpapers once a day. */
+    val dailySoftWallpaper: Boolean = false,
 )

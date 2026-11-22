@@ -126,6 +126,7 @@ class HomeViewModel @Inject constructor(
     fun refreshDefaultHomeStatus() = homeRoleRepository.refresh()
 
     fun openAssistant() = commandBus.send(UiCommand.OpenAssistant)
+    fun showMessage(text: String) = commandBus.send(UiCommand.ShowMessage(text))
 
     // --- Launching ---
 
