@@ -129,6 +129,7 @@ fun AppDrawerOverlay(
         surfaceAlpha = if (state.settings.lowPerformanceMode) 1f else state.settings.drawerPanelAlpha,
         widthFraction = state.settings.drawerWidthFraction,
         heightFraction = state.settings.drawerHeightFraction,
+        fullScreen = state.settings.drawerFullScreen,
     ) {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 12.dp),

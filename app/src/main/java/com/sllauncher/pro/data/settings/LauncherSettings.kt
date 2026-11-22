@@ -78,6 +78,8 @@ data class LauncherSettings(
     val drawerSort: DrawerSort = DrawerSort.Name,
     val drawerShowAlphabetIndex: Boolean = true,
     val drawerShowRecents: Boolean = true,
+    /** Full-screen app list (default in v2); off gives the floating panel. */
+    val drawerFullScreen: Boolean = true,
     val drawerWidthFraction: Float = 0.8f,
     val drawerHeightFraction: Float = 0.7f,
     val drawerPanelAlpha: Float = 0.94f,

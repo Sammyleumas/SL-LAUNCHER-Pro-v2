@@ -163,8 +163,16 @@ fun CustomizationRoute(onBack: () -> Unit, viewModel: CustomizationViewModel = h
                 "Drawer" -> {
                     StepSlider("Columns", s.drawerColumns, 3..7) { v -> viewModel.update { it.copy(drawerColumns = v) } }
                     PercentSlider("Icon size", s.drawerIconScale, 0.7f..1.3f) { v -> viewModel.update { it.copy(drawerIconScale = v) } }
-                    PercentSlider("Panel width", s.drawerWidthFraction, 0.7f..0.95f) { v -> viewModel.update { it.copy(drawerWidthFraction = v) } }
-                    PercentSlider("Panel height", s.drawerHeightFraction, 0.6f..0.9f) { v -> viewModel.update { it.copy(drawerHeightFraction = v) } }
+                    SLSwitchRow(
+                        title = "Full-screen app drawer",
+                        subtitle = "Off shows the apps in a smaller floating panel",
+                        checked = s.drawerFullScreen,
+                        onCheckedChange = { on -> viewModel.update { it.copy(drawerFullScreen = on) } },
+                    )
+                    if (!s.drawerFullScreen) {
+                        PercentSlider("Panel width", s.drawerWidthFraction, 0.7f..0.95f) { v -> viewModel.update { it.copy(drawerWidthFraction = v) } }
+                        PercentSlider("Panel height", s.drawerHeightFraction, 0.6f..0.9f) { v -> viewModel.update { it.copy(drawerHeightFraction = v) } }
+                    }
                     PercentSlider("Panel opacity", s.drawerPanelAlpha, 0.8f..1f) { v -> viewModel.update { it.copy(drawerPanelAlpha = v) } }
                     SLSwitchRow("App names", s.drawerShowLabels, { on -> viewModel.update { it.copy(drawerShowLabels = on) } })
                     SLSwitchRow("List view", s.drawerListMode, { on -> viewModel.update { it.copy(drawerListMode = on) } })

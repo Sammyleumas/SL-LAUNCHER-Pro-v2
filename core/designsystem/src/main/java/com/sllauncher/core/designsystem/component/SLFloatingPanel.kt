@@ -9,6 +9,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -36,6 +38,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -69,6 +72,8 @@ import kotlin.math.roundToInt
  *   lets a hint of wallpaper through without hurting legibility.
  * @param widthFraction preferred share of the window width (user setting).
  * @param heightFraction preferred share of the window height (user setting).
+ * @param fullScreen fills the whole window edge to edge (content stays clear
+ *   of the status and navigation bars) and slides up instead of scaling in.
  */
 @Composable
 fun SLFloatingPanel(
@@ -78,6 +83,7 @@ fun SLFloatingPanel(
     modifier: Modifier = Modifier,
     dismissOnScrimTap: Boolean = true,
     dragToDismiss: Boolean = true,
+    fullScreen: Boolean = false,
     surfaceAlpha: Float = 0.94f,
     widthFraction: Float = 0.8f,
     heightFraction: Float = 0.7f,
@@ -118,20 +124,32 @@ fun SLFloatingPanel(
         // Size from the area inside the status and navigation bars, so the
         // panel never slides under them on short or landscape windows.
         BoxWithConstraints(
-            Modifier.fillMaxSize().safeDrawingPadding(),
+            Modifier.fillMaxSize().then(if (fullScreen) Modifier else Modifier.safeDrawingPadding()),
             contentAlignment = Alignment.Center,
         ) {
-            val panelSize = floatingPanelSize(maxWidth, maxHeight, widthFraction, heightFraction)
+            val panelSize = if (fullScreen) {
+                FloatingPanelSize(maxWidth, maxHeight)
+            } else {
+                floatingPanelSize(maxWidth, maxHeight, widthFraction, heightFraction)
+            }
             AnimatedVisibility(
                 visibleState = visibleState,
-                enter = fadeIn(motion.medium()) + scaleIn(motion.medium(), initialScale = 0.94f),
-                exit = fadeOut(motion.short()) + scaleOut(motion.short(), targetScale = 0.96f),
+                enter = if (fullScreen) {
+                    fadeIn(motion.medium()) + slideInVertically(motion.medium()) { it / 6 }
+                } else {
+                    fadeIn(motion.medium()) + scaleIn(motion.medium(), initialScale = 0.94f)
+                },
+                exit = if (fullScreen) {
+                    fadeOut(motion.short()) + slideOutVertically(motion.short()) { it / 6 }
+                } else {
+                    fadeOut(motion.short()) + scaleOut(motion.short(), targetScale = 0.96f)
+                },
             ) {
                 var dragOffset by remember { mutableFloatStateOf(0f) }
                 val scope = rememberCoroutineScope()
                 LaunchedEffect(visible) { if (visible) dragOffset = 0f }
                 val dismissThreshold = with(LocalDensity.current) { 120.dp.toPx() }
-                val panelShape = RoundedCornerShape(shapes.cornerLarge)
+                val panelShape = if (fullScreen) RectangleShape else RoundedCornerShape(shapes.cornerLarge)
 
                 Column(
                     Modifier
@@ -139,6 +157,7 @@ fun SLFloatingPanel(
                         .offset { IntOffset(0, dragOffset.roundToInt()) }
                         .softRaised(panelShape, softStyle(colors.surface.copy(alpha = surfaceAlpha), shapes.panelDepth))
                         .clip(panelShape)
+                        .then(if (fullScreen) Modifier.safeDrawingPadding() else Modifier)
                         .semantics { paneTitle = title },
                 ) {
                     if (dragToDismiss) {
