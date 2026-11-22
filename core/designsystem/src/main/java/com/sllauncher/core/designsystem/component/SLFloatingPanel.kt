@@ -10,7 +10,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -25,6 +24,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +36,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -51,7 +53,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 /**
- * SL's signature floating panel: a dark block centred over a dimmed
+ * SL's signature floating panel: a raised soft surface centred over a dimmed
  * wallpaper, sized by [floatingPanelSize]. Used by the app drawer and
  * other launcher overlays.
  *
@@ -129,14 +131,14 @@ fun SLFloatingPanel(
                 val scope = rememberCoroutineScope()
                 LaunchedEffect(visible) { if (visible) dragOffset = 0f }
                 val dismissThreshold = with(LocalDensity.current) { 120.dp.toPx() }
+                val panelShape = RoundedCornerShape(shapes.cornerLarge)
 
                 Column(
                     Modifier
                         .size(panelSize.width, panelSize.height)
                         .offset { IntOffset(0, dragOffset.roundToInt()) }
-                        .blockShadow(colors.border, shapes.panelShadowOffset)
-                        .background(colors.surface.copy(alpha = surfaceAlpha))
-                        .border(shapes.borderWidth, colors.border)
+                        .softRaised(panelShape, softStyle(colors.surface.copy(alpha = surfaceAlpha), shapes.panelDepth))
+                        .clip(panelShape)
                         .semantics { paneTitle = title },
                 ) {
                     if (dragToDismiss) {
@@ -167,7 +169,7 @@ fun SLFloatingPanel(
                                 },
                             contentAlignment = Alignment.Center,
                         ) {
-                            Box(Modifier.size(width = 40.dp, height = 4.dp).background(colors.borderStrong))
+                            Box(Modifier.size(width = 40.dp, height = 5.dp).background(colors.borderStrong, CircleShape))
                         }
                     }
                     content()

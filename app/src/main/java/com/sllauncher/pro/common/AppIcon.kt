@@ -22,6 +22,16 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
+import com.sllauncher.pro.data.settings.IconShape
 
 /** Gives composables access to the singleton icon loader without threading it through every screen. */
 @EntryPoint
@@ -71,13 +81,41 @@ fun ShortcutIcon(info: ShortcutInfo?, label: String, size: Dp, modifier: Modifie
     IconOrFallback(bitmap, label, size, modifier)
 }
 
+/** How app icons are drawn everywhere, from the user's settings (provided by MainActivity). */
+@Immutable
+data class IconStyle(val shape: IconShape = IconShape.System, val softPlate: Boolean = true)
+
+val LocalIconStyle = staticCompositionLocalOf { IconStyle() }
+
+private fun IconShape.toShape(): Shape? = when (this) {
+    IconShape.System -> null
+    IconShape.Circle -> CircleShape
+    IconShape.Squircle -> RoundedCornerShape(32)
+    IconShape.Square -> RoundedCornerShape(14)
+}
+
 @Composable
 private fun IconOrFallback(bitmap: ImageBitmap?, label: String, size: Dp, modifier: Modifier) {
-    if (bitmap != null) {
-        Image(bitmap = bitmap, contentDescription = null, modifier = modifier.size(size))
-    } else {
-        Box(modifier.size(size).background(SLTheme.colors.surfaceElevated), contentAlignment = Alignment.Center) {
-            Text(label.take(1).uppercase(), style = SLTheme.typography.title, color = SLTheme.colors.textSecondary)
+    val style = LocalIconStyle.current
+    val clipShape = style.shape.toShape()
+    val plateShape = clipShape ?: RoundedCornerShape(30)
+    Box(
+        modifier
+            .size(size)
+            .then(if (style.softPlate) Modifier.softRaised(plateShape, softStyle(depth = 3.dp)) else Modifier),
+        contentAlignment = Alignment.Center,
+    ) {
+        val inner = if (style.softPlate) size * 0.76f else size
+        val clip = clipShape?.let { Modifier.clip(it) } ?: Modifier
+        if (bitmap != null) {
+            Image(bitmap = bitmap, contentDescription = null, modifier = Modifier.size(inner).then(clip))
+        } else {
+            Box(
+                Modifier.size(inner).then(clip).background(SLTheme.colors.surfaceElevated),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label.take(1).uppercase(), style = SLTheme.typography.title, color = SLTheme.colors.textSecondary)
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,17 +26,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sllauncher.core.designsystem.icon.SLIcons
 import com.sllauncher.core.designsystem.theme.SLColors
 import com.sllauncher.core.designsystem.theme.SLTheme
 
 enum class SLButtonStyle {
-    /** The one main action on a screen. Yellow. */
+    /** The one main action on a screen. Accent fill. */
     Primary,
 
-    /** Supporting actions. Outlined surface. */
+    /** Supporting actions. Raised soft surface with an outline. */
     Secondary,
 
     /** Low-emphasis actions such as "Cancel". No fill, no shadow. */
@@ -57,9 +55,9 @@ private fun SLColors.forStyle(style: SLButtonStyle) = when (style) {
 }
 
 /**
- * Neo-brutalist button: flat fill, hard border and an offset block shadow.
- * Pressing it slides the face onto its shadow, which is the press feedback
- * (no ripple, no glow). Always at least 48dp tall for accessibility.
+ * Soft-UI button: a rounded surface raised off the page by soft shadows,
+ * with a thin outline so it reads as tappable without relying on shadows.
+ * Pressing it sinks the surface into the page. Always at least 48dp tall.
  */
 @Composable
 fun SLButton(
@@ -78,7 +76,7 @@ fun SLButton(
         enabled = enabled,
         container = colors.container,
         outline = colors.outline,
-        shadowOffset = if (colors.hasShadow) SLTheme.shapes.blockShadowOffset else 0.dp,
+        raised = colors.hasShadow,
         role = Role.Button,
         contentPadding = Modifier.padding(horizontal = spacing.xl, vertical = spacing.md),
     ) {
@@ -90,7 +88,7 @@ fun SLButton(
                 Icon(leadingIcon, contentDescription = null, tint = colors.content, modifier = Modifier.size(SLTheme.sizes.iconSmall))
             }
             Text(
-                text = text.uppercase(),
+                text = text,
                 style = SLTheme.typography.label,
                 color = colors.content,
                 textAlign = TextAlign.Center,
@@ -123,7 +121,7 @@ fun SLIconButton(
         enabled = enabled,
         container = container,
         outline = outline,
-        shadowOffset = if (style == SLIconButtonStyle.Plain) 0.dp else SLTheme.shapes.blockShadowOffset,
+        raised = style != SLIconButtonStyle.Plain,
         role = Role.Button,
         contentPadding = Modifier.size(SLTheme.shapes.minTouchTarget),
         onClickLabel = contentDescription,
@@ -133,9 +131,9 @@ fun SLIconButton(
 }
 
 /**
- * Shared press mechanics for SL buttons: block shadow behind, face that
- * moves onto the shadow while pressed. Reduced motion has no effect here
- * because the movement is an instant state change, not an animation.
+ * Shared press mechanics for SL buttons: raised while idle, pressed into the
+ * page while touched. The change is instant, so reduced motion needs no
+ * special case.
  */
 @Composable
 private fun PressableBlock(
@@ -144,7 +142,7 @@ private fun PressableBlock(
     enabled: Boolean,
     container: Color,
     outline: Color,
-    shadowOffset: Dp,
+    raised: Boolean,
     role: Role,
     contentPadding: Modifier,
     onClickLabel: String? = null,
@@ -154,45 +152,36 @@ private fun PressableBlock(
     val shape = RoundedCornerShape(shapes.cornerSmall)
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val faceOffset = if (pressed && enabled) shadowOffset else 0.dp
+    val style = softStyle(container)
+    val surface = when {
+        !raised -> Modifier.background(container, shape)
+        pressed && enabled -> Modifier.softInset(shape, style)
+        else -> Modifier.softRaised(shape, style)
+    }
 
     Box(
         modifier = modifier
-            .padding(end = shadowOffset, bottom = shadowOffset)
-            .alpha(if (enabled) 1f else 0.4f),
-        propagateMinConstraints = true,
-    ) {
-        if (shadowOffset > 0.dp) {
-            Box(
-                Modifier
-                    .matchParentSize()
-                    .offset(shadowOffset, shadowOffset)
-                    .background(SLTheme.colors.border, shape),
+            .alpha(if (enabled) 1f else 0.4f)
+            .defaultMinSize(minWidth = shapes.minTouchTarget, minHeight = shapes.minTouchTarget)
+            .then(surface)
+            .border(shapes.borderWidth, outline, shape)
+            .clickable(
+                interactionSource = interaction,
+                indication = null,
+                enabled = enabled,
+                onClickLabel = onClickLabel,
+                role = role,
+                onClick = onClick,
             )
-        }
-        Box(
-            modifier = Modifier
-                .offset(faceOffset, faceOffset)
-                .defaultMinSize(minWidth = shapes.minTouchTarget, minHeight = shapes.minTouchTarget)
-                .background(container, shape)
-                .border(shapes.borderWidth, outline, shape)
-                .clickable(
-                    interactionSource = interaction,
-                    indication = null,
-                    enabled = enabled,
-                    onClickLabel = onClickLabel,
-                    role = role,
-                    onClick = onClick,
-                )
-                .then(contentPadding),
-            contentAlignment = Alignment.Center,
-        ) {
-            content()
-        }
+            .then(contentPadding),
+        contentAlignment = Alignment.Center,
+        propagateMinConstraints = false,
+    ) {
+        content()
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true)
 @Composable
 private fun SLButtonPreview() {
     SLTheme {

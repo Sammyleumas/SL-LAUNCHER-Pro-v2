@@ -7,7 +7,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,7 +71,7 @@ fun SLLoadingIndicator(
         horizontalArrangement = Arrangement.spacedBy(blockSize / 2),
     ) {
         repeat(3) { index ->
-            Box(Modifier.size(blockSize).background(if (index == activeIndex) activeColor else idleColor))
+            Box(Modifier.size(blockSize).background(if (index == activeIndex) activeColor else idleColor, CircleShape))
         }
     }
 }
@@ -88,14 +88,14 @@ fun SLProgressBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(6.dp)
-            .background(colors.surfaceElevated)
+            .height(8.dp)
+            .softInset(CircleShape, softStyle(colors.surfaceElevated))
             .semantics {
                 if (contentDescription != null) this.contentDescription = contentDescription
                 progressBarRangeInfo = ProgressBarRangeInfo(clamped, 0f..1f)
             },
     ) {
-        Box(Modifier.fillMaxWidth(clamped).height(6.dp).background(colors.accent))
+        Box(Modifier.fillMaxWidth(clamped).height(8.dp).background(colors.accent, CircleShape))
     }
 }
 
@@ -126,8 +126,8 @@ fun SLMessageState(
     ) {
         Box(
             Modifier
-                .size(56.dp)
-                .border(SLTheme.shapes.borderWidth, accent),
+                .size(64.dp)
+                .softRaised(CircleShape, softStyle()),
             contentAlignment = Alignment.Center,
         ) {
             Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(28.dp))
@@ -171,7 +171,7 @@ fun SLErrorState(
     retryLabel: String = stringResource(R.string.sl_ds_retry),
 ) = SLMessageState(title, body, modifier, SLIcons.Warning, SLMessageTone.Error, retryLabel, onRetry)
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true, widthDp = 360)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true, widthDp = 360)
 @Composable
 private fun SLFeedbackPreview() {
     SLTheme(reduceMotion = true) {

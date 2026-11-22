@@ -2,18 +2,28 @@ package com.sllauncher.pro.data.settings
 
 import kotlinx.serialization.Serializable
 
-enum class ThemeMode { Dark, Light }
+enum class ThemeMode { Light, Dark, Auto }
 
-/** Curated accents. Yellow is the brand; others are premium theme options (Phase 17). */
-enum class AccentPreset(val argb: Long, val premium: Boolean) {
-    Yellow(0xFFFFD400, premium = false),
-    Orange(0xFFFF8A00, premium = true),
-    Lime(0xFFC6F432, premium = true),
-    Cyan(0xFF2EE6E6, premium = true),
-    Pink(0xFFFF5FA2, premium = true),
+/**
+ * Curated accents, all free. Each has a deep tone for the light theme
+ * (white text on it, at least 4.5:1) and a pale tone for the dark theme
+ * (dark text on it).
+ */
+enum class AccentPreset(val lightArgb: Long, val darkArgb: Long) {
+    Blue(0xFF3A55D9, 0xFF8FA2FF),
+    Teal(0xFF00695C, 0xFF4DD0C1),
+    Coral(0xFFC2410C, 0xFFFF9E7A),
+    Purple(0xFF7E22CE, 0xFFC59BFF),
+    Green(0xFF1B5E20, 0xFF7FD68A),
+    ;
+
+    fun argbFor(dark: Boolean): Long = if (dark) darkArgb else lightArgb
 }
 
 enum class DisplayFont { Brand, System }
+
+/** Shape every app icon is cut to. [System] keeps the icon's own shape. */
+enum class IconShape { System, Circle, Squircle, Square }
 
 enum class DrawerSort { Name, MostUsed, RecentlyInstalled }
 
@@ -63,10 +73,13 @@ data class LauncherSettings(
     val islandShowMessages: Boolean = true,
 
     // Theme
-    val themeMode: ThemeMode = ThemeMode.Dark,
-    val accent: AccentPreset = AccentPreset.Yellow,
+    val themeMode: ThemeMode = ThemeMode.Light,
+    val accent: AccentPreset = AccentPreset.Blue,
     val displayFont: DisplayFont = DisplayFont.Brand,
     val iconPackPackage: String? = null,
+    val iconShape: IconShape = IconShape.System,
+    /** Sits each icon on a raised soft plate (the soft-UI look). */
+    val iconSoftPlate: Boolean = true,
 
     // Performance and motion
     val lowPerformanceMode: Boolean = false,

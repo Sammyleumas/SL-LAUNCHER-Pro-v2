@@ -13,7 +13,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -58,9 +59,7 @@ fun SLDialog(
                 .padding(spacing.xl)
                 .widthIn(max = 420.dp)
                 .fillMaxWidth()
-                .blockShadow(colors.border, SLTheme.shapes.panelShadowOffset)
-                .background(colors.surface)
-                .border(SLTheme.shapes.borderWidth, colors.borderStrong)
+                .softRaised(RoundedCornerShape(SLTheme.shapes.cornerLarge), softStyle(depth = SLTheme.shapes.panelDepth))
                 .padding(spacing.xl),
             verticalArrangement = Arrangement.spacedBy(spacing.lg),
         ) {
@@ -88,8 +87,8 @@ fun SLDialog(
 }
 
 /**
- * Modal bottom sheet in SL styling: square top, hard border line, SL drag
- * handle. Opens fully expanded (no half-open state) so content is never
+ * Modal bottom sheet in soft styling: large rounded top corners and a
+ * rounded drag handle. Opens fully expanded (no half-open state) so content is never
  * cut off on short phones.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,17 +104,14 @@ fun SLBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        shape = RectangleShape,
+        shape = RoundedCornerShape(topStart = SLTheme.shapes.cornerLarge, topEnd = SLTheme.shapes.cornerLarge),
         containerColor = colors.surface,
         contentColor = colors.textPrimary,
         tonalElevation = 0.dp,
         scrimColor = colors.scrim,
         dragHandle = {
-            Column(Modifier.fillMaxWidth()) {
-                Box(Modifier.fillMaxWidth().height(SLTheme.shapes.borderWidth).background(colors.borderStrong))
-                Box(Modifier.fillMaxWidth().padding(vertical = SLTheme.spacing.md), contentAlignment = Alignment.Center) {
-                    Box(Modifier.size(width = 40.dp, height = 4.dp).background(colors.borderStrong))
-                }
+            Box(Modifier.fillMaxWidth().padding(vertical = SLTheme.spacing.md), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(width = 40.dp, height = 5.dp).background(colors.borderStrong, CircleShape))
             }
         },
     ) {

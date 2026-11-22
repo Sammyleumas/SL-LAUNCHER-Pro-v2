@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.sllauncher.core.designsystem.theme.SLTheme
 
 /**
- * A content block (SL's "card"). Use sparingly: only for content that is a
- * distinct object, such as a widget or a now-playing panel, never as a
- * default wrapper for every section.
+ * A content block (SL's soft "card"). Use for content that is a distinct
+ * object, such as a widget or a now-playing panel.
  *
- * @param shadow adds the offset block shadow to lift the block off the page.
+ * @param elevated draws the block pressed into the page instead of raised.
+ * @param shadow lifts the block off the page with soft shadows; without it
+ *   the block is a flat rounded surface with a hairline edge.
  */
 @Composable
 fun SLBlock(
@@ -34,27 +37,31 @@ fun SLBlock(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = SLTheme.colors
+    val shape = RoundedCornerShape(SLTheme.shapes.cornerMedium)
+    val surface = when {
+        elevated -> Modifier.softInset(shape, softStyle(colors.surfaceElevated))
+        shadow -> Modifier.softRaised(shape, softStyle())
+        else -> Modifier.background(colors.surface, shape).border(SLTheme.shapes.borderWidth, colors.border, shape)
+    }
     Column(
         modifier = modifier
-            .then(if (shadow) Modifier.blockShadow(colors.border, SLTheme.shapes.blockShadowOffset) else Modifier)
-            .background(if (elevated) colors.surfaceElevated else colors.surface)
-            .border(SLTheme.shapes.borderWidth, colors.border)
+            .then(surface)
             .padding(SLTheme.spacing.lg),
         verticalArrangement = Arrangement.spacedBy(SLTheme.spacing.sm),
         content = content,
     )
 }
 
-/** Section heading with the yellow SL tick. Marked as a heading for TalkBack navigation. */
+/** Section heading with a small accent dot. Marked as a heading for TalkBack navigation. */
 @Composable
 fun SLSectionHeader(text: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.semantics { heading() },
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(width = 16.dp, height = 4.dp).background(SLTheme.colors.accentIndicator))
+        Box(Modifier.size(8.dp).background(SLTheme.colors.accentIndicator, CircleShape))
         Text(
-            text = text.uppercase(),
+            text = text,
             style = SLTheme.typography.label,
             color = SLTheme.colors.textSecondary,
             modifier = Modifier.padding(start = SLTheme.spacing.sm),
@@ -62,7 +69,7 @@ fun SLSectionHeader(text: String, modifier: Modifier = Modifier) {
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true, widthDp = 320)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true, widthDp = 320)
 @Composable
 private fun SLBlockPreview() {
     SLTheme {

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -37,12 +38,12 @@ import androidx.compose.ui.unit.dp
 import com.sllauncher.core.designsystem.R
 import com.sllauncher.core.designsystem.theme.SLTheme
 
-private val SliderThumbSize = 20.dp
-private val SliderTrackHeight = 6.dp
+private val SliderThumbSize = 24.dp
+private val SliderTrackHeight = 10.dp
 
 /**
- * Brutalist slider: square thumb on a hard-edged track, filled in yellow up
- * to the current value. Tap or drag anywhere on the 48dp-tall control.
+ * Soft slider: a raised round thumb on a pressed-in track, filled with the
+ * accent up to the current value. Tap or drag anywhere on the 48dp-tall control.
  * TalkBack users can adjust it with volume keys / swipe (setProgress).
  *
  * @param contentDescription what the slider controls, e.g. "Icon size".
@@ -109,27 +110,27 @@ fun SLSlider(
             Modifier
                 .fillMaxWidth()
                 .height(SliderTrackHeight)
-                .background(colors.surfaceElevated)
-                .border(1.dp, colors.borderStrong),
+                .softInset(CircleShape, softStyle(colors.surfaceElevated))
+                .border(1.dp, colors.borderStrong, CircleShape),
         )
         Box(
             Modifier
                 .fillMaxWidth(fraction)
                 .height(SliderTrackHeight)
-                .background(colors.accent),
+                .background(colors.accent, CircleShape),
         )
         Box(
             Modifier
                 .offset(x = (trackWidth - SliderThumbSize) * fraction)
                 .size(SliderThumbSize)
-                .background(colors.accent)
-                .border(SLTheme.shapes.borderWidth, colors.accentOutline),
+                .softRaised(CircleShape, softStyle(depth = 3.dp))
+                .border(2.dp, colors.accentOutline, CircleShape),
         )
     }
 }
 
 /**
- * Square on/off switch. Pass `onCheckedChange = null` when the switch sits
+ * Soft on/off switch: a raised knob sliding in a pressed-in track. Pass `onCheckedChange = null` when the switch sits
  * inside a row that handles the toggle itself (see [SLSwitchRow]).
  */
 @Composable
@@ -166,21 +167,21 @@ fun SLSwitch(
         Box(
             Modifier
                 .size(width = 52.dp, height = 28.dp)
-                .background(if (checked) colors.accent else colors.surface)
-                .border(SLTheme.shapes.borderWidth, if (checked) colors.accentOutline else colors.borderStrong)
+                .softInset(CircleShape, softStyle(if (checked) colors.accent else colors.surfaceElevated))
+                .border(SLTheme.shapes.borderWidth, if (checked) colors.accentOutline else colors.borderStrong, CircleShape)
                 .padding(4.dp),
         ) {
             Box(
                 Modifier
                     .offset(x = knobOffset)
                     .size(20.dp)
-                    .background(if (checked) colors.onAccent else colors.textSecondary),
+                    .softRaised(CircleShape, softStyle(if (checked) colors.onAccent else colors.surface, 2.dp)),
             )
         }
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true, widthDp = 320)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true, widthDp = 320)
 @Composable
 private fun SLControlsPreview() {
     SLTheme {

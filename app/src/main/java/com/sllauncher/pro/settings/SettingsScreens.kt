@@ -32,7 +32,6 @@ import com.sllauncher.pro.navigation.LauncherSetupDestination
 import com.sllauncher.pro.navigation.MusicDestination
 import com.sllauncher.pro.navigation.NewsDestination
 import com.sllauncher.pro.navigation.NotificationCenterDestination
-import com.sllauncher.pro.navigation.PremiumDestination
 import com.sllauncher.pro.navigation.PrivacyDestination
 import com.sllauncher.pro.navigation.ProductivityDestination
 import com.sllauncher.pro.navigation.QuickSettingsDestination
@@ -65,7 +64,6 @@ fun NavGraphBuilder.settingsGraph(nav: NavHostController) {
     composable<CustomizationDestination> { CustomizationRoute(onBack = back) }
     composable<PrivacyDestination> { PrivacyRoute(onBack = back) }
     composable<AssistantDestination> { AssistantSettingsRoute(onBack = back) }
-    composable<PremiumDestination> { PremiumRoute(onBack = back) }
     composable<AboutDestination> { AboutRoute(onBack = back) }
 }
 
@@ -73,7 +71,6 @@ fun NavGraphBuilder.settingsGraph(nav: NavHostController) {
 class GeneralSettingsViewModel @Inject constructor(
     private val settings: SettingsRepository,
     val voice: VoiceInput,
-    val entitlements: EntitlementRepository,
     private val bus: UiCommandBus,
 ) : ViewModel() {
     val state: StateFlow<LauncherSettings> = settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), settings.current)
@@ -97,7 +94,6 @@ fun SettingsHubRoute(onBack: () -> Unit, onNavigate: (Any) -> Unit) {
         SLNavigationRow("Notes, tasks and focus", { onNavigate(ProductivityDestination) })
         SLSectionHeader("You", Modifier.padding(16.dp, 12.dp))
         SLNavigationRow("Privacy and backup", { onNavigate(PrivacyDestination) })
-        SLNavigationRow("SL Premium", { onNavigate(PremiumDestination) })
         SLNavigationRow("About", { onNavigate(AboutDestination) })
     }
 }
@@ -150,50 +146,23 @@ fun AssistantSettingsRoute(onBack: () -> Unit, viewModel: GeneralSettingsViewMod
 }
 
 @Composable
-fun PremiumRoute(onBack: () -> Unit, viewModel: GeneralSettingsViewModel = hiltViewModel()) {
-    val tier by viewModel.entitlements.tier.collectAsStateWithLifecycle()
-    ScreenScaffold(title = "SL Premium", onBack = onBack, scrollable = true) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Your plan: ${tier.name}", style = SLTheme.typography.headline, color = SLTheme.colors.textPrimary)
-            SLBlock(Modifier.fillMaxWidth()) {
-                Text("Free, always", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
-                Text("Home screen, floating drawer, search, SL commands, Dynamic Island, notifications, news, music, notes and tasks, privacy controls and backup. No ads on your home screen, ever.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
-            }
-            SLBlock(Modifier.fillMaxWidth()) {
-                Text("Premium", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
-                PremiumFeature.entries.filter { it.tier == Tier.Premium }.forEach { Text("• ${it.label}", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary) }
-            }
-            SLBlock(Modifier.fillMaxWidth()) {
-                Text("AI", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
-                PremiumFeature.entries.filter { it.tier == Tier.AI }.forEach { Text("• ${it.label}", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary) }
-            }
-            Text(
-                "Purchases aren't available yet. They will be sold through Google Play once SL is published, and unlocked only after Google Play confirms the purchase.",
-                style = SLTheme.typography.body,
-                color = SLTheme.colors.textSecondary,
-            )
-        }
-    }
-}
-
-@Composable
 fun AboutRoute(onBack: () -> Unit) {
     val context = LocalContext.current
     val version = remember(context) { versionName(context) }
     val licence by produceState("") {
         value = withContext(Dispatchers.IO) {
-            runCatching { context.assets.open("licenses/space-grotesk-OFL.txt").bufferedReader().readText() }.getOrDefault("")
+            runCatching { context.assets.open("licenses/nunito-OFL.txt").bufferedReader().readText() }.getOrDefault("")
         }
     }
     ScreenScaffold(title = "About", onBack = onBack, scrollable = true) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("SL Launcher", style = SLTheme.typography.headline, color = SLTheme.colors.textPrimary)
+            Text("SL Launcher Pro", style = SLTheme.typography.headline, color = SLTheme.colors.textPrimary)
             Text("Version $version", style = SLTheme.typography.body, color = SLTheme.colors.textSecondary)
             SLSectionHeader("Privacy")
-            Text("SL has no account, no ads and no analytics. Your data stays on your phone. The full privacy policy is published with the app's store listing.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
+            Text("SL has no account, no ads, no in-app purchases and no analytics. Every feature is free. Your data stays on your phone. The full privacy policy is published with the app's store listing.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
             SLSectionHeader("Open-source licences")
             Text("Built with Android Jetpack (AndroidX, Compose, Room, DataStore, WorkManager, Media3), Kotlin, Dagger Hilt and Coil, under the Apache License 2.0.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
-            Text("Space Grotesk font", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
+            Text("Nunito font", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
             Text(licence, style = SLTheme.typography.caption, color = SLTheme.colors.textSecondary)
         }
     }

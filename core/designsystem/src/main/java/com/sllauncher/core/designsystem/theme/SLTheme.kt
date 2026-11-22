@@ -21,18 +21,21 @@ import androidx.compose.ui.platform.LocalContext
  *
  * @param reduceMotion force reduced motion on or off; `null` follows the
  *   Android "Remove animations" setting.
+ * @param softShadows false draws flat surfaces instead of blurred soft
+ *   shadows (low-performance mode).
  */
 @Composable
 fun SLTheme(
-    colors: SLColors = DarkSLColors,
+    colors: SLColors = DefaultSLColors,
     typography: SLTypography = DefaultSLTypography,
     reduceMotion: Boolean? = null,
+    softShadows: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val systemReduced = remember(context) { systemAnimationsDisabled(context) }
     val motion = SLMotion(reduced = reduceMotion ?: systemReduced)
-    val shapes = SLShapes()
+    val shapes = SLShapes(softShadows = softShadows)
 
     CompositionLocalProvider(
         LocalSLColors provides colors,
@@ -49,7 +52,7 @@ fun SLTheme(
                 small = RoundedCornerShape(shapes.cornerSmall),
                 medium = RoundedCornerShape(shapes.cornerMedium),
                 large = RoundedCornerShape(shapes.cornerMedium),
-                extraLarge = RoundedCornerShape(shapes.cornerMedium),
+                extraLarge = RoundedCornerShape(shapes.cornerLarge),
             ),
             content = content,
         )

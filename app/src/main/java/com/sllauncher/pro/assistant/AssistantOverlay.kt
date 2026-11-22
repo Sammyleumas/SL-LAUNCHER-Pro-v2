@@ -43,6 +43,10 @@ import com.sllauncher.core.designsystem.component.SLButtonStyle
 import com.sllauncher.core.designsystem.component.SLFloatingPanel
 import com.sllauncher.core.designsystem.component.SLSearchField
 import com.sllauncher.core.designsystem.theme.SLTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
+import com.sllauncher.core.designsystem.component.softInset
 
 /** The SL assistant panel: conversation, voice button and text input. */
 @Composable
@@ -108,8 +112,13 @@ private fun Bubble(m: ChatMessage, viewModel: AssistantViewModel, onOpenSettings
         Column(
             Modifier
                 .widthIn(max = 300.dp)
-                .background(if (mine) SLTheme.colors.surfaceElevated else SLTheme.colors.background)
-                .border(SLTheme.shapes.borderWidth, if (mine) SLTheme.colors.border else SLTheme.colors.accentOutline)
+                .then(
+                    if (mine) {
+                        Modifier.softInset(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle(SLTheme.colors.surfaceElevated))
+                    } else {
+                        Modifier.softRaised(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle(depth = 3.dp))
+                    },
+                )
                 .padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {

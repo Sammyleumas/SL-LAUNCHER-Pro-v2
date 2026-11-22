@@ -53,9 +53,9 @@ fun parseBackup(json: Json, text: String): SLBackup {
     val backup = try {
         json.decodeFromString(SLBackup.serializer(), text)
     } catch (e: IllegalArgumentException) {
-        throw InvalidBackupException("This isn't an SL Launcher backup file.")
+        throw InvalidBackupException("This isn't an SL Launcher Pro backup file.")
     }
-    if (backup.format != BACKUP_FORMAT) throw InvalidBackupException("This isn't an SL Launcher backup file.")
+    if (backup.format != BACKUP_FORMAT) throw InvalidBackupException("This isn't an SL Launcher Pro backup file.")
     if (backup.version > BACKUP_VERSION) throw InvalidBackupException("This backup was made by a newer SL version. Update SL first.")
     val ids = backup.homeItems.map { it.id }.toSet()
     if (ids.size != backup.homeItems.size) throw InvalidBackupException("The home layout in this backup is damaged.")

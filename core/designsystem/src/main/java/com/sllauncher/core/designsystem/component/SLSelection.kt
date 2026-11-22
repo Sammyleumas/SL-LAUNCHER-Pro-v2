@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -33,7 +34,8 @@ import com.sllauncher.core.designsystem.theme.SLTheme
 
 /**
  * Category selector chip ("All", "Social", "Games"...). Selected chips are
- * yellow; unselected chips are outlined. 40dp tall with a 48dp touch area.
+ * pressed into the page and filled with the accent; unselected chips are
+ * raised with an outline. 40dp tall with a 48dp touch area.
  */
 @Composable
 fun SLChip(
@@ -53,13 +55,19 @@ fun SLChip(
         Box(
             Modifier
                 .height(40.dp)
-                .background(if (selected) colors.accent else colors.surface)
-                .border(SLTheme.shapes.borderWidth, if (selected) colors.accentOutline else colors.borderStrong)
+                .then(
+                    if (selected) {
+                        Modifier.softInset(CircleShape, softStyle(colors.accent))
+                    } else {
+                        Modifier.softRaised(CircleShape, softStyle(depth = 3.dp))
+                    },
+                )
+                .border(SLTheme.shapes.borderWidth, if (selected) colors.accentOutline else colors.borderStrong, CircleShape)
                 .padding(horizontal = SLTheme.spacing.lg),
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = label.uppercase(),
+                text = label,
                 style = SLTheme.typography.label,
                 color = if (selected) colors.onAccent else colors.textPrimary,
                 maxLines = 1,
@@ -90,8 +98,8 @@ fun <T> SLChipRow(
 }
 
 /**
- * Two to four mutually exclusive options in one outlined bar, such as the
- * app drawer's grid/list toggle. Each option is an equal-width segment.
+ * Two to four mutually exclusive options in one pressed-in track, such as
+ * the app drawer's grid/list toggle. The selected option is a raised pill.
  */
 @Composable
 fun SLSegmentedControl(
@@ -103,7 +111,9 @@ fun SLSegmentedControl(
     val colors = SLTheme.colors
     Row(
         modifier = modifier
-            .border(SLTheme.shapes.borderWidth, colors.borderStrong)
+            .softInset(CircleShape, softStyle(colors.surfaceElevated))
+            .border(SLTheme.shapes.borderWidth, colors.borderStrong, CircleShape)
+            .padding(3.dp)
             .selectableGroup(),
     ) {
         options.forEachIndexed { index, option ->
@@ -111,8 +121,8 @@ fun SLSegmentedControl(
             Row(
                 modifier = Modifier
                     .weight(1f, fill = false)
-                    .heightIn(min = SLTheme.shapes.minTouchTarget)
-                    .background(if (selected) colors.accent else colors.surface)
+                    .heightIn(min = SLTheme.shapes.minTouchTarget - 6.dp)
+                    .then(if (selected) Modifier.softRaised(CircleShape, softStyle(colors.accent, 3.dp)) else Modifier)
                     .selectable(selected = selected, role = Role.RadioButton, onClick = { onSelect(index) })
                     .padding(horizontal = SLTheme.spacing.md),
                 verticalAlignment = Alignment.CenterVertically,
@@ -124,7 +134,7 @@ fun SLSegmentedControl(
                 }
                 if (option.showLabel) {
                     if (option.icon != null) Spacer(Modifier.size(SLTheme.spacing.sm))
-                    Text(option.label.uppercase(), style = SLTheme.typography.label, color = tint, maxLines = 1)
+                    Text(option.label, style = SLTheme.typography.label, color = tint, maxLines = 1)
                 }
             }
         }
@@ -141,7 +151,7 @@ data class SLNavItem(val label: String, val icon: ImageVector, val badgeCount: I
 
 /**
  * Bottom navigation for floating panels and full-screen sections. The active
- * item gets a yellow bar on top and full-strength text; others are muted.
+ * item sits in a pressed-in pill in the accent colour; others are muted.
  */
 @Composable
 fun SLNavBar(
@@ -160,7 +170,7 @@ fun SLNavBar(
     ) {
         items.forEachIndexed { index, item ->
             val selected = index == selectedIndex
-            val tint = if (selected) colors.textPrimary else colors.textSecondary
+            val tint = if (selected) colors.accentIndicator else colors.textSecondary
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -168,14 +178,13 @@ fun SLNavBar(
                     .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Spacer(Modifier.height(SLTheme.spacing.sm))
                 Box(
                     Modifier
-                        .fillMaxWidth()
-                        .height(3.dp)
-                        .background(if (selected) colors.accentIndicator else colors.border),
-                )
-                Spacer(Modifier.height(SLTheme.spacing.sm))
-                Box {
+                        .size(width = 56.dp, height = 30.dp)
+                        .then(if (selected) Modifier.softInset(CircleShape, softStyle(colors.surfaceElevated)) else Modifier),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Icon(item.icon, contentDescription = null, tint = tint, modifier = Modifier.size(SLTheme.sizes.icon))
                     if (item.badgeCount > 0) {
                         SLBadge(count = item.badgeCount, modifier = Modifier.align(Alignment.TopEnd).padding(start = 16.dp))
@@ -194,7 +203,7 @@ fun SLNavBar(
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true, widthDp = 360)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true, widthDp = 360)
 @Composable
 private fun SLSelectionPreview() {
     SLTheme {

@@ -163,7 +163,7 @@ private fun AccessCard(onOpenSettings: () -> Unit) {
             style = SLTheme.typography.bodySmall,
             color = SLTheme.colors.textSecondary,
         )
-        Text("In the next screen, find SL Launcher and switch it on.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
+        Text("In the next screen, find SL Launcher Pro and switch it on.", style = SLTheme.typography.bodySmall, color = SLTheme.colors.textSecondary)
         SLButton("Open notification access", onOpenSettings, modifier = Modifier.padding(top = 8.dp))
     }
 }

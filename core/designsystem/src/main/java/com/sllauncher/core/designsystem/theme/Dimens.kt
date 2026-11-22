@@ -19,16 +19,23 @@ data class SLSpacing(
 )
 
 /**
- * Neo-brutalist shape language: hard edges, visible borders, and an offset
- * "block shadow" instead of soft blurred elevation.
+ * Soft-UI shape language: generous rounded corners, surfaces that look
+ * raised from or pressed into the background, and a thin outline on
+ * interactive controls so they are visible without relying on shadows.
  */
 @Immutable
 data class SLShapes(
-    val cornerSmall: Dp = 2.dp,
-    val cornerMedium: Dp = 4.dp,
-    val borderWidth: Dp = 2.dp,
-    val blockShadowOffset: Dp = 4.dp,
-    val panelShadowOffset: Dp = 6.dp,
+    val cornerSmall: Dp = 14.dp,
+    val cornerMedium: Dp = 22.dp,
+    val cornerLarge: Dp = 30.dp,
+    /** Outline width for interactive controls. */
+    val borderWidth: Dp = 1.dp,
+    /** Shadow distance for raised elements. */
+    val softDepth: Dp = 5.dp,
+    /** Shadow distance for floating panels, dialogs and the assistant button. */
+    val panelDepth: Dp = 9.dp,
+    /** False in low-performance mode: shadows become flat outlines (cheaper to draw). */
+    val softShadows: Boolean = true,
     /** Minimum interactive size required by accessibility guidelines. */
     val minTouchTarget: Dp = 48.dp,
 )

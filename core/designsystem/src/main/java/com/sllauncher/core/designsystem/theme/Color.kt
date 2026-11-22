@@ -5,57 +5,66 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * Raw brand palette. Never reference these from feature code directly;
- * use [SLColors] through `SLTheme.colors` so themes can be swapped later.
+ * Raw soft-UI palette. Never reference these from feature code directly;
+ * use [SLColors] through `SLTheme.colors` so themes can be swapped.
+ *
+ * Contrast (WCAG relative luminance), measured against the base surface:
+ * - Light: text 11.0:1, secondary text 6.4:1, control outline 3.3:1.
+ * - Dark: text 12.6:1, secondary text 6.6:1, control outline 3.6:1.
+ * Classic neumorphism relies on shadows alone and fails these; SL keeps the
+ * soft shadows but adds real outlines and strong text so it stays readable.
  */
 internal object SLPalette {
-    val Black = Color(0xFF090909)
-    val Charcoal = Color(0xFF151515)
-    val Graphite = Color(0xFF252525)
-    val Yellow = Color(0xFFFFD400)
-    val OffWhite = Color(0xFFF5F1E8)
-    val Grey = Color(0xFFA5A5A5)
-    val BorderGrey = Color(0xFF383838)
+    // Light soft
+    val Cloud = Color(0xFFE6E9EF)
+    val CloudDeep = Color(0xFFDCE0E8)
+    val Slate = Color(0xFF2D3142)
+    val SlateSoft = Color(0xFF4A5068)
+    val CloudLine = Color(0xFFC3C7CF)
+    val Outline = Color(0xFF7A8092)
+    val ShadowDarkOnLight = Color(0xFFB8BEC9)
+    val ShadowLightOnLight = Color(0xFFFFFFFF)
+    val ErrorOnLight = Color(0xFFB3261E)
 
-    /**
-     * Interactive outlines (WCAG 1.4.11 needs 3:1). Measured: 4.20 on Black,
-     * 3.85 on Charcoal, 3.23 on Graphite, 4.21 / 3.77 / 3.34 on the paper surfaces.
-     */
-    val OutlineGrey = Color(0xFF737373)
-    val ErrorRed = Color(0xFFFF5A4E)
+    // Dark soft
+    val Night = Color(0xFF23262D)
+    val NightRaised = Color(0xFF2B2F37)
+    val Mist = Color(0xFFE8EAF0)
+    val MistSoft = Color(0xFFA9AFBF)
+    val NightLine = Color(0xFF3A3F49)
+    val ShadowDarkOnDark = Color(0xFF16181D)
+    val ShadowLightOnDark = Color(0xFF30343D)
+    val ErrorOnDark = Color(0xFFFF8A80)
 
-    // Light ("paper") variant.
-    val Paper = Color(0xFFF5F1E8)
-    val PaperDim = Color(0xFFEAE5D9)
-    val PaperDeep = Color(0xFFDED8CA)
-    val Ink = Color(0xFF090909)
-    val InkSoft = Color(0xFF4A4A4A)
-    val PaperBorder = Color(0xFFC9C3B5)
-    val DarkYellow = Color(0xFF7A6000)
-    val ErrorRedDark = Color(0xFFB3261E)
+    // Default accent (blue): a deep tone on light, a pale tone on dark.
+    val BlueDeep = Color(0xFF3A55D9)
+    val BluePale = Color(0xFF8FA2FF)
+    val InkOnPale = Color(0xFF101320)
 }
 
 /**
- * Semantic colour roles for SL Launcher. Names describe purpose, not hue,
+ * Semantic colour roles for SL Launcher Pro. Names describe purpose, not hue,
  * so a user theme can change the values without touching screens.
  */
 @Immutable
 data class SLColors(
     val isDark: Boolean,
     val background: Color,
+    /** Raised soft surfaces. Equal to [background] in neumorphism: shape comes from shadows. */
     val surface: Color,
+    /** Pressed-in wells and secondary fills. */
     val surfaceElevated: Color,
     /** Fill colour for primary actions, selected states and SL identity. */
     val accent: Color,
     /** Text and icons drawn on top of [accent]. */
     val onAccent: Color,
-    /** Accent used as a thin line or small mark directly on [background]/[surface]. */
+    /** Accent used as text, a thin line or a small mark directly on [background]. */
     val accentIndicator: Color,
-    /** Outline around an [accent] fill so the shape reads on light surfaces too. */
+    /** Outline around an [accent] fill. */
     val accentOutline: Color,
     val textPrimary: Color,
     val textSecondary: Color,
-    /** Decorative dividers and block shadows. Not for control outlines. */
+    /** Decorative dividers. Not for control outlines. */
     val border: Color,
     /** Outlines of interactive controls; meets the 3:1 non-text contrast minimum. */
     val borderStrong: Color,
@@ -63,49 +72,53 @@ data class SLColors(
     val onError: Color,
     /** Dims the wallpaper behind floating panels, dialogs and sheets. */
     val scrim: Color,
+    /** Soft shadow cast away from the light (bottom-right). */
+    val shadowDark: Color,
+    /** Soft highlight towards the light (top-left). */
+    val shadowLight: Color,
+)
+
+val LightSLColors = SLColors(
+    isDark = false,
+    background = SLPalette.Cloud,
+    surface = SLPalette.Cloud,
+    surfaceElevated = SLPalette.CloudDeep,
+    accent = SLPalette.BlueDeep,
+    onAccent = Color.White,
+    accentIndicator = SLPalette.BlueDeep,
+    accentOutline = SLPalette.BlueDeep,
+    textPrimary = SLPalette.Slate,
+    textSecondary = SLPalette.SlateSoft,
+    border = SLPalette.CloudLine,
+    borderStrong = SLPalette.Outline,
+    error = SLPalette.ErrorOnLight,
+    onError = Color.White,
+    scrim = Color(0x662D3142),
+    shadowDark = SLPalette.ShadowDarkOnLight,
+    shadowLight = SLPalette.ShadowLightOnLight,
 )
 
 val DarkSLColors = SLColors(
     isDark = true,
-    background = SLPalette.Black,
-    surface = SLPalette.Charcoal,
-    surfaceElevated = SLPalette.Graphite,
-    accent = SLPalette.Yellow,
-    onAccent = SLPalette.Black,
-    accentIndicator = SLPalette.Yellow,
-    accentOutline = SLPalette.Yellow,
-    textPrimary = SLPalette.OffWhite,
-    textSecondary = SLPalette.Grey,
-    border = SLPalette.BorderGrey,
-    borderStrong = SLPalette.OutlineGrey,
-    error = SLPalette.ErrorRed,
-    onError = SLPalette.Black,
+    background = SLPalette.Night,
+    surface = SLPalette.Night,
+    surfaceElevated = SLPalette.NightRaised,
+    accent = SLPalette.BluePale,
+    onAccent = SLPalette.InkOnPale,
+    accentIndicator = SLPalette.BluePale,
+    accentOutline = SLPalette.BluePale,
+    textPrimary = SLPalette.Mist,
+    textSecondary = SLPalette.MistSoft,
+    border = SLPalette.NightLine,
+    borderStrong = SLPalette.Outline,
+    error = SLPalette.ErrorOnDark,
+    onError = SLPalette.InkOnPale,
     scrim = Color(0x99000000),
+    shadowDark = SLPalette.ShadowDarkOnDark,
+    shadowLight = SLPalette.ShadowLightOnDark,
 )
 
-/**
- * Paper variant. Yellow stays a fill colour only: yellow text or thin yellow
- * lines on off-white fail contrast, so [accentIndicator] becomes dark ochre.
- */
-val LightSLColors = SLColors(
-    isDark = false,
-    background = SLPalette.Paper,
-    surface = SLPalette.PaperDim,
-    surfaceElevated = SLPalette.PaperDeep,
-    accent = SLPalette.Yellow,
-    onAccent = SLPalette.Ink,
-    accentIndicator = SLPalette.DarkYellow,
-    accentOutline = SLPalette.Ink,
-    textPrimary = SLPalette.Ink,
-    textSecondary = SLPalette.InkSoft,
-    border = SLPalette.PaperBorder,
-    borderStrong = SLPalette.OutlineGrey,
-    error = SLPalette.ErrorRedDark,
-    onError = SLPalette.Paper,
-    scrim = Color(0x66000000),
-)
-
-/** Kept for Phase 1 call sites; the dark palette is the brand default. */
-val DefaultSLColors = DarkSLColors
+/** The light soft palette is the brand default. */
+val DefaultSLColors = LightSLColors
 
 internal val LocalSLColors = staticCompositionLocalOf { DefaultSLColors }

@@ -63,6 +63,10 @@ import com.sllauncher.core.designsystem.icon.SLIcons
 import com.sllauncher.core.designsystem.theme.SLTheme
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import androidx.compose.foundation.shape.CircleShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
+import androidx.compose.ui.draw.clip
 
 private enum class Overlay { None, Drawer, Search, Folder }
 
@@ -319,8 +323,9 @@ private fun HomeSearchBar(onClick: () -> Unit, modifier: Modifier = Modifier) {
         modifier
             .fillMaxWidth()
             .heightIn(min = 48.dp)
-            .background(SLTheme.colors.surface.copy(alpha = 0.85f))
-            .border(SLTheme.shapes.borderWidth, SLTheme.colors.borderStrong)
+            .softRaised(CircleShape, softStyle(SLTheme.colors.surface.copy(alpha = 0.94f)))
+            .border(SLTheme.shapes.borderWidth, SLTheme.colors.borderStrong, CircleShape)
+            .clip(CircleShape)
             .clickable(role = Role.Button, onClickLabel = "Search", onClick = onClick)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,

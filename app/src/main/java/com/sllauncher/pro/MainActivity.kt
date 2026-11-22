@@ -48,6 +48,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import javax.inject.Inject
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
 
 /**
  * The launcher's single home activity. Registered for the HOME category,
@@ -87,9 +90,10 @@ class MainActivity : ComponentActivity() {
             val settings by settingsRepository.settingsOrNull.collectAsStateWithLifecycle()
             val current = settings ?: return@setContent // First read takes a few ms; avoid flashing defaults.
             SLTheme(
-                colors = colorsFor(current),
+                colors = colorsFor(current, androidx.compose.foundation.isSystemInDarkTheme()),
                 typography = typographyFor(current),
                 reduceMotion = if (current.lowPerformanceMode) true else null,
+                softShadows = !current.lowPerformanceMode,
             ) {
                 val navController = rememberNavController()
                 val snackbar = remember { SnackbarHostState() }
@@ -114,6 +118,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+                androidx.compose.runtime.CompositionLocalProvider(
+                    com.sllauncher.pro.common.LocalIconStyle provides com.sllauncher.pro.common.IconStyle(current.iconShape, current.iconSoftPlate),
+                ) {
                 Box(Modifier.fillMaxSize()) {
                     SLNavHost(
                         navController = navController,
@@ -127,6 +134,7 @@ class MainActivity : ComponentActivity() {
                         SLSnackbar(data.visuals.message)
                     }
                     shell.Overlays()
+                }
                 }
             }
         }
@@ -158,8 +166,8 @@ private fun SLSnackbar(message: String) {
         color = SLTheme.colors.textPrimary,
         modifier = Modifier
             .fillMaxWidth()
-            .background(SLTheme.colors.surfaceElevated)
-            .border(SLTheme.shapes.borderWidth, SLTheme.colors.borderStrong)
+            .softRaised(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle())
+            .border(SLTheme.shapes.borderWidth, SLTheme.colors.borderStrong, RoundedCornerShape(SLTheme.shapes.cornerMedium))
             .padding(16.dp),
     )
 }

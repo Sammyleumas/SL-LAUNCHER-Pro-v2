@@ -6,7 +6,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -63,9 +64,8 @@ fun SLAssistantButton(
     Box(
         modifier = modifier
             .size(SLTheme.sizes.assistantButton)
-            .blockShadow(colors.border, SLTheme.shapes.blockShadowOffset)
-            .background(colors.accent)
-            .border(SLTheme.shapes.borderWidth, colors.accentOutline)
+            .softRaised(CircleShape, softStyle(colors.accent, SLTheme.shapes.panelDepth))
+            .clip(CircleShape)
             .clickable(role = Role.Button, onClick = onClick)
             .semantics {
                 contentDescription = label
@@ -109,12 +109,12 @@ private fun LevelBars(periodMillis: Int) {
                 )
                 animated
             }
-            Box(Modifier.width(5.dp).height(28.dp * fraction).background(color))
+            Box(Modifier.width(5.dp).height(28.dp * fraction).background(color, CircleShape))
         }
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true)
 @Composable
 private fun SLAssistantButtonPreview() {
     SLTheme(reduceMotion = true) {

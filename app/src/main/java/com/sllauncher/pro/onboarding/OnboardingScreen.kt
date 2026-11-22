@@ -97,14 +97,14 @@ fun OnboardingRoute(onDone: () -> Unit, viewModel: OnboardingViewModel = hiltVie
             ) {
                 when (step) {
                     0 -> Step(
-                        "Welcome to SL Launcher",
+                        "Welcome to SL Launcher Pro",
                         "A home screen built around you: a floating app drawer, the SL assistant, a live Dynamic Island, news, music and your own layout. This takes about a minute.",
                     )
                     1 -> {
                         Step("What you get", "Everything works on your phone. Nothing is uploaded unless you turn on a feature that needs the internet, such as news.")
                         listOf(
                             "Floating app drawer" to "Swipe up on the home screen. Categories, favourites, search.",
-                            "SL assistant" to "Tap the yellow button and speak or type: \"set a timer for 10 minutes\".",
+                            "SL assistant" to "Tap the round SL button and speak or type: \"set a timer for 10 minutes\".",
                             "Dynamic Island" to "Music, charging, messages and calls at the top of your home screen.",
                             "Your layout" to "Pages, widgets, folders, icon packs, themes and saved profiles.",
                         ).forEach { (t, b) ->
@@ -120,7 +120,7 @@ fun OnboardingRoute(onDone: () -> Unit, viewModel: OnboardingViewModel = hiltVie
                             "Android lets you choose which app opens when you press Home. You can switch back any time in Android Settings › Apps › Default apps.",
                         )
                         if (isDefault) {
-                            Text("SL Launcher is your default home app.", style = SLTheme.typography.title, color = SLTheme.colors.accentIndicator)
+                            Text("SL Launcher Pro is your default home app.", style = SLTheme.typography.title, color = SLTheme.colors.accentIndicator)
                         } else {
                             SLButton("Set as default home app", {
                                 val intent = viewModel.checker.createRoleRequestIntent()
@@ -156,9 +156,9 @@ fun OnboardingRoute(onDone: () -> Unit, viewModel: OnboardingViewModel = hiltVie
                         )
                         SLSectionHeader("Theme")
                         SLSegmentedControl(
-                            options = listOf(SLSegment("Dark"), SLSegment("Light")),
-                            selectedIndex = if (settings.themeMode == ThemeMode.Dark) 0 else 1,
-                            onSelect = { i -> viewModel.update { it.copy(themeMode = if (i == 0) ThemeMode.Dark else ThemeMode.Light) } },
+                            options = listOf(SLSegment("Light"), SLSegment("Dark"), SLSegment("Auto")),
+                            selectedIndex = settings.themeMode.ordinal,
+                            onSelect = { i -> viewModel.update { it.copy(themeMode = ThemeMode.entries[i]) } },
                         )
                         SLSwitchRow(title = "Show app names", checked = settings.homeShowLabels, onCheckedChange = { on -> viewModel.update { it.copy(homeShowLabels = on, drawerShowLabels = on) } })
                         SLSwitchRow(
@@ -169,7 +169,7 @@ fun OnboardingRoute(onDone: () -> Unit, viewModel: OnboardingViewModel = hiltVie
                         )
                     }
                     else -> {
-                        Step("Meet SL", "SL is your assistant inside the launcher. Tap the yellow SL button on the home screen, then speak or type. The first time you speak, Android asks for microphone access.")
+                        Step("Meet SL", "SL is your assistant inside the launcher. Tap the round SL button on the home screen, then speak or type. The first time you speak, Android asks for microphone access.")
                         SLSwitchRow(
                             title = "SL speaks replies",
                             subtitle = "Uses your phone's text-to-speech voice",

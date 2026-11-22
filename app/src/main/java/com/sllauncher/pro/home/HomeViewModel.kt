@@ -135,7 +135,7 @@ class HomeViewModel @Inject constructor(
             is ShortcutTile -> {
                 val item = tile.item
                 val ok = appRepository.startShortcut(item.shortcutPackage ?: return, item.shortcutId ?: return, item.userSerial)
-                if (!ok) commandBus.send(UiCommand.ShowMessage("Shortcuts open only while SL Launcher is your home app."))
+                if (!ok) commandBus.send(UiCommand.ShowMessage("Shortcuts open only while SL Launcher Pro is your home app."))
             }
             else -> Unit
         }

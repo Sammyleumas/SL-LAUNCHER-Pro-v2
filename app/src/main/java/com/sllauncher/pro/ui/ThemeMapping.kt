@@ -13,18 +13,18 @@ import com.sllauncher.core.designsystem.theme.SLTypography
 import com.sllauncher.core.designsystem.theme.withFontFamily
 
 /**
- * Applies the user's theme choices to the design-system tokens. Accents
- * are fills; on the light palette, thin accent marks stay dark ochre and
- * fills keep an ink outline so they remain visible (see DESIGN-SYSTEM.md).
+ * Applies the user's theme choices to the design-system tokens.
+ * [systemDark] is the phone's dark-mode setting, used by [ThemeMode.Auto].
  */
-fun colorsFor(settings: LauncherSettings): SLColors {
-    val base = if (settings.themeMode == ThemeMode.Dark) DarkSLColors else LightSLColors
-    val accent = Color(settings.accent.argb)
-    return if (base.isDark) {
-        base.copy(accent = accent, accentIndicator = accent, accentOutline = accent)
-    } else {
-        base.copy(accent = accent)
+fun colorsFor(settings: LauncherSettings, systemDark: Boolean): SLColors {
+    val dark = when (settings.themeMode) {
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+        ThemeMode.Auto -> systemDark
     }
+    val base = if (dark) DarkSLColors else LightSLColors
+    val accent = Color(settings.accent.argbFor(dark))
+    return base.copy(accent = accent, accentIndicator = accent, accentOutline = accent)
 }
 
 fun typographyFor(settings: LauncherSettings): SLTypography = when (settings.displayFont) {

@@ -46,6 +46,10 @@ import com.sllauncher.core.designsystem.theme.SLTheme
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
+import com.sllauncher.core.designsystem.component.softInset
 
 @HiltViewModel
 class QuickSettingsViewModel @Inject constructor(
@@ -128,15 +132,21 @@ fun QuickSettingsRoute(onBack: () -> Unit, onNavigate: (Any) -> Unit, viewModel:
                     Modifier
                         .fillMaxWidth()
                         .heightIn(min = 76.dp)
-                        .background(if (tile.on == true) SLTheme.colors.accent else SLTheme.colors.surface)
-                        .border(SLTheme.shapes.borderWidth, if (tile.on == true) SLTheme.colors.accentOutline else SLTheme.colors.borderStrong)
+                        .then(
+                            if (tile.on == true) {
+                                Modifier.softInset(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle(SLTheme.colors.accent))
+                            } else {
+                                Modifier.softRaised(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle())
+                            },
+                        )
+                        .border(SLTheme.shapes.borderWidth, if (tile.on == true) SLTheme.colors.accentOutline else SLTheme.colors.borderStrong, RoundedCornerShape(SLTheme.shapes.cornerMedium))
                         .clickable(role = if (tile.on != null) Role.Switch else Role.Button, onClick = tile.onClick)
                         .semantics { if (tile.on != null) stateDescription = if (tile.on) "On" else "Off" }
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     val c = if (tile.on == true) SLTheme.colors.onAccent else SLTheme.colors.textPrimary
-                    Text(tile.label.uppercase(), style = SLTheme.typography.label, color = c)
+                    Text(tile.label, style = SLTheme.typography.label, color = c)
                     Text(tile.detail, style = SLTheme.typography.caption, color = if (tile.on == true) c else SLTheme.colors.textSecondary)
                 }
             }

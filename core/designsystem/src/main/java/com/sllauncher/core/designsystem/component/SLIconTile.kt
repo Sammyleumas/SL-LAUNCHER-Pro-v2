@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,7 +52,7 @@ fun SLBadge(count: Int, modifier: Modifier = Modifier) {
         modifier = modifier
             .clearAndSetSemantics { contentDescription = description }
             .defaultMinSize(minWidth = 18.dp, minHeight = 18.dp)
-            .background(colors.accent)
+            .background(colors.accent, CircleShape)
             .padding(horizontal = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -63,10 +65,10 @@ fun SLBadge(count: Int, modifier: Modifier = Modifier) {
     }
 }
 
-/** Small yellow square marking "something new" where a number is not useful. */
+/** Small accent dot marking "something new" where a number is not useful. */
 @Composable
 fun SLDotBadge(modifier: Modifier = Modifier) {
-    Box(modifier.size(8.dp).background(SLTheme.colors.accentIndicator))
+    Box(modifier.size(8.dp).background(SLTheme.colors.accentIndicator, CircleShape))
 }
 
 /**
@@ -121,18 +123,18 @@ fun SLIconTile(
     }
 }
 
-/** Placeholder icon for previews and the catalogue: a coloured block with an initial. */
+/** Placeholder icon for previews and the catalogue: a raised soft square with an initial. */
 @Composable
 fun SLPlaceholderIcon(initial: String, size: Dp = SLTheme.sizes.appIcon) {
     Box(
-        Modifier.size(size).background(SLTheme.colors.surfaceElevated),
+        Modifier.size(size).softRaised(RoundedCornerShape(SLTheme.shapes.cornerSmall), softStyle()),
         contentAlignment = Alignment.Center,
     ) {
         Text(initial.take(1).uppercase(), style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
     }
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true)
 @Composable
 private fun SLIconTilePreview() {
     SLTheme {

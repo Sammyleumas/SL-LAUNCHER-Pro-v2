@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,7 +34,7 @@ import com.sllauncher.core.designsystem.icon.SLIcons
 import com.sllauncher.core.designsystem.theme.SLTheme
 
 /**
- * Single-line search input. The outline turns yellow while focused, a clear
+ * Single-line search input. The outline turns to the accent colour while focused, a clear
  * button appears once there is text, and the keyboard shows a Search key.
  *
  * @param trailing optional extra control, e.g. a voice-input button.
@@ -69,9 +70,9 @@ fun SLSearchField(
             Row(
                 modifier = Modifier
                     .heightIn(min = SLTheme.sizes.controlHeight)
-                    .background(colors.surface)
-                    .border(shapes.borderWidth, if (focused) colors.accentOutline else colors.borderStrong)
-                    .padding(start = spacing.md),
+                    .softInset(CircleShape, softStyle(colors.surfaceElevated))
+                    .border(if (focused) 2.dp else shapes.borderWidth, if (focused) colors.accentOutline else colors.borderStrong, CircleShape)
+                    .padding(start = spacing.lg),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -107,7 +108,7 @@ fun SLSearchField(
     )
 }
 
-@Preview(backgroundColor = 0xFF090909, showBackground = true)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true)
 @Composable
 private fun SLSearchFieldPreview() {
     SLTheme {

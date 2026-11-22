@@ -35,6 +35,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
 
 data class OverviewState(val lines: List<String> = emptyList())
 
@@ -76,8 +79,7 @@ fun DailyOverview(viewModel: DailyOverviewViewModel = hiltViewModel()) {
         Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .background(SLTheme.colors.surface.copy(alpha = 0.78f))
-            .border(2.dp, SLTheme.colors.border)
+            .softRaised(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle(SLTheme.colors.surface.copy(alpha = 0.92f)))
             .clickable(role = Role.Button, onClickLabel = "Open productivity") { viewModel.open() }
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),

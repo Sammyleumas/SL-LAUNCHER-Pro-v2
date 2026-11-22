@@ -21,5 +21,4 @@ import kotlinx.serialization.Serializable
 @Serializable data object ProductivityDestination
 @Serializable data object CustomizationDestination
 @Serializable data object PrivacyDestination
-@Serializable data object PremiumDestination
 @Serializable data object AboutDestination

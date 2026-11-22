@@ -13,35 +13,21 @@ import androidx.compose.ui.unit.sp
 import com.sllauncher.core.designsystem.R
 
 /**
- * Space Grotesk (SIL Open Font License, see assets/licenses) is bundled as a
- * single 133 KB variable font and used for display text, headings and labels,
- * where the brand voice lives. Each weight below selects a point on the
- * font's weight axis (300–700).
+ * Nunito (SIL Open Font License, see assets/licenses) is bundled as one
+ * variable font. Its rounded terminals match the soft UI. Each weight below
+ * selects a point on the font's weight axis.
  */
 @OptIn(ExperimentalTextApi::class)
-internal val SLDisplayFontFamily = FontFamily(
-    Font(
-        R.font.space_grotesk,
-        weight = FontWeight.Medium,
-        variationSettings = FontVariation.Settings(FontVariation.weight(500)),
-    ),
-    Font(
-        R.font.space_grotesk,
-        weight = FontWeight.SemiBold,
-        variationSettings = FontVariation.Settings(FontVariation.weight(600)),
-    ),
-    Font(
-        R.font.space_grotesk,
-        weight = FontWeight.Bold,
-        variationSettings = FontVariation.Settings(FontVariation.weight(700)),
-    ),
+private fun nunito(weight: Int) = Font(
+    R.font.nunito,
+    weight = FontWeight(weight),
+    variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
 
-/**
- * Running text uses the platform sans-serif: zero APK cost and tuned for
- * long reading (news, notifications, settings descriptions).
- */
-internal val SLBodyFontFamily: FontFamily = FontFamily.SansSerif
+internal val SLDisplayFontFamily = FontFamily(nunito(400), nunito(500), nunito(600), nunito(700), nunito(800))
+
+/** Body text uses Nunito too, so the whole interface has one soft voice. */
+internal val SLBodyFontFamily: FontFamily = SLDisplayFontFamily
 
 /** All sizes are in `sp`, so they follow the user's system font-size setting. */
 @Immutable
@@ -58,10 +44,10 @@ data class SLTypography(
 val DefaultSLTypography = SLTypography(
     display = TextStyle(
         fontFamily = SLDisplayFontFamily,
-        fontWeight = FontWeight.Bold,
+        fontWeight = FontWeight.ExtraBold,
         fontSize = 64.sp,
-        lineHeight = 64.sp,
-        letterSpacing = (-0.03).em,
+        lineHeight = 68.sp,
+        letterSpacing = (-0.02).em,
     ),
     headline = TextStyle(
         fontFamily = SLDisplayFontFamily,
@@ -93,11 +79,11 @@ val DefaultSLTypography = SLTypography(
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 18.sp,
-        letterSpacing = 0.06.em,
+        letterSpacing = 0.02.em,
     ),
     caption = TextStyle(
         fontFamily = SLBodyFontFamily,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 12.sp,
         lineHeight = 16.sp,
     ),

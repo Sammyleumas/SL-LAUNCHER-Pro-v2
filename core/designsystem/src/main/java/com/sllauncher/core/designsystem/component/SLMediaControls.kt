@@ -57,7 +57,7 @@ fun SLMediaControls(
     }
 }
 
-@Preview(backgroundColor = 0xFF151515, showBackground = true)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true)
 @Composable
 private fun SLMediaControlsPreview() {
     SLTheme {

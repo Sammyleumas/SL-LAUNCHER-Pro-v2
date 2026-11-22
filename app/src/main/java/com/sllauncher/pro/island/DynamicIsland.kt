@@ -74,6 +74,8 @@ import com.sllauncher.core.designsystem.component.SLSearchField
 import com.sllauncher.core.designsystem.icon.SLIcons
 import com.sllauncher.core.designsystem.theme.SLTheme
 import kotlinx.coroutines.delay
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 
 /** The island is always black, like the hardware cutout it echoes, in every theme. */
 private val IslandBlack = Color(0xFF090909)
@@ -152,8 +154,8 @@ fun DynamicIsland(onOpenSettings: () -> Unit, viewModel: IslandViewModel = hiltV
 private fun SetupPill(onClick: () -> Unit) {
     Row(
         Modifier
-            .background(IslandBlack)
-            .border(1.5.dp, SLTheme.colors.accent)
+            .background(IslandBlack, CircleShape)
+            .border(1.5.dp, SLTheme.colors.accent, CircleShape)
             .pointerInput(Unit) { detectTapGestures { onClick() } }
             .semantics { onClick(label = "Turn on notification access") { onClick(); true } }
             .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -183,8 +185,7 @@ private fun CompactPill(
         Modifier
             .widthIn(min = 160.dp, max = 360.dp)
             .heightIn(min = 40.dp)
-            .background(IslandBlack)
-            .border(1.5.dp, SLTheme.colors.border)
+            .background(IslandBlack, CircleShape)
             .pointerInput(activity.id) { detectTapGestures(onTap = { onTap() }, onLongPress = { onLongPress() }) }
             .pointerInput(count) {
                 detectHorizontalDragGestures(
@@ -275,8 +276,7 @@ private fun Expanded(activity: IslandActivity, now: Long, state: IslandUiState, 
             .padding(top = 6.dp)
             .fillMaxWidth()
             .widthIn(max = 480.dp)
-            .background(IslandBlack)
-            .border(1.5.dp, SLTheme.colors.border)
+            .background(IslandBlack, RoundedCornerShape(28.dp))
             .padding(14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {

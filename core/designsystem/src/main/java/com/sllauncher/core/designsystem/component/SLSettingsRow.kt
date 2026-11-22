@@ -121,7 +121,7 @@ private fun RowLayout(
     }
 }
 
-@Preview(backgroundColor = 0xFF151515, showBackground = true, widthDp = 360)
+@Preview(backgroundColor = 0xFFE6E9EF, showBackground = true, widthDp = 360)
 @Composable
 private fun SLSettingsRowPreview() {
     SLTheme {

@@ -71,6 +71,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import javax.inject.Inject
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
+import com.sllauncher.core.designsystem.component.softInset
+import com.sllauncher.pro.data.settings.IconShape
 
 @HiltViewModel
 class CustomizationViewModel @Inject constructor(
@@ -78,7 +84,6 @@ class CustomizationViewModel @Inject constructor(
     private val profiles: ProfileManager,
     private val iconPacks: IconPackManager,
     private val icons: AppIconLoader,
-    val entitlements: EntitlementRepository,
     private val bus: UiCommandBus,
 ) : ViewModel() {
     val state: StateFlow<LauncherSettings> = settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), settings.current)
@@ -106,11 +111,6 @@ class CustomizationViewModel @Inject constructor(
     }
 
     fun saveProfile(name: String) = viewModelScope.launch {
-        val count = savedProfiles.value.count { !it.name.startsWith("__") }
-        if (count >= 3 && !entitlements.has(PremiumFeature.CustomProfiles)) {
-            bus.send(UiCommand.ShowMessage("Free includes 3 saved profiles. Delete one to save another."))
-            return@launch
-        }
         profiles.saveCurrentAs(name)
         bus.send(UiCommand.ShowMessage("Saved \"$name\"."))
     }
@@ -188,7 +188,7 @@ fun CustomizationRoute(onBack: () -> Unit, viewModel: CustomizationViewModel = h
                 "Theme" -> {
                     SLSectionHeader("Mode", Modifier.padding(16.dp, 8.dp))
                     SLSegmentedControl(
-                        options = listOf(SLSegment("Dark"), SLSegment("Light")),
+                        options = listOf(SLSegment("Light"), SLSegment("Dark"), SLSegment("Auto")),
                         selectedIndex = s.themeMode.ordinal,
                         onSelect = { i -> viewModel.update { it.copy(themeMode = ThemeMode.entries[i]) } },
                         modifier = Modifier.padding(horizontal = 16.dp),
@@ -196,27 +196,37 @@ fun CustomizationRoute(onBack: () -> Unit, viewModel: CustomizationViewModel = h
                     SLSectionHeader("Accent", Modifier.padding(16.dp, 8.dp))
                     Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         AccentPreset.entries.forEach { a ->
-                            val locked = a.premium && !viewModel.entitlements.has(PremiumFeature.ExtraAccents)
                             Box(
                                 Modifier
                                     .size(48.dp)
-                                    .background(Color(a.argb))
-                                    .border(if (s.accent == a) 4.dp else 2.dp, if (s.accent == a) SLTheme.colors.textPrimary else SLTheme.colors.borderStrong)
-                                    .clickable(role = Role.RadioButton, enabled = !locked) { viewModel.update { it.copy(accent = a) } }
-                                    .semantics { contentDescription = "${a.name} accent" + if (locked) ", premium" else "" },
-                                contentAlignment = Alignment.Center,
-                            ) { if (locked) Text("P", style = SLTheme.typography.label, color = Color(0xFF090909)) }
+                                    .softRaised(CircleShape, softStyle(Color(a.argbFor(SLTheme.colors.isDark)), 3.dp))
+                                    .border(if (s.accent == a) 4.dp else 1.dp, if (s.accent == a) SLTheme.colors.textPrimary else SLTheme.colors.borderStrong, CircleShape)
+                                    .clickable(role = Role.RadioButton) { viewModel.update { it.copy(accent = a) } }
+                                    .semantics { contentDescription = "${a.name} accent" },
+                            )
                         }
                     }
-                    Text("Accents marked P are part of SL Premium, which isn't on sale yet.", style = SLTheme.typography.caption, color = SLTheme.colors.textSecondary, modifier = Modifier.padding(16.dp, 4.dp))
                     SLSectionHeader("Font", Modifier.padding(16.dp, 8.dp))
                     SLSegmentedControl(
-                        options = listOf(SLSegment("SL (Space Grotesk)"), SLSegment("System")),
+                        options = listOf(SLSegment("SL (Nunito)"), SLSegment("System")),
                         selectedIndex = s.displayFont.ordinal,
                         onSelect = { i -> viewModel.update { it.copy(displayFont = DisplayFont.entries[i]) } },
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
                     SLNavigationRow("Icon pack", { showPacks = true }, value = s.iconPackPackage ?: "System icons")
+                    SLSectionHeader("Icon shape", Modifier.padding(16.dp, 8.dp))
+                    SLSegmentedControl(
+                        options = IconShape.entries.map { SLSegment(it.name) },
+                        selectedIndex = s.iconShape.ordinal,
+                        onSelect = { i -> viewModel.update { it.copy(iconShape = IconShape.entries[i]) } },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    )
+                    SLSwitchRow(
+                        title = "Soft icon plates",
+                        subtitle = "Sits each icon on a raised soft tile",
+                        checked = s.iconSoftPlate,
+                        onCheckedChange = { on -> viewModel.update { it.copy(iconSoftPlate = on) } },
+                    )
                     SLSwitchRow("Low-performance mode", s.lowPerformanceMode, { on -> viewModel.update { it.copy(lowPerformanceMode = on) } }, subtitle = "No animations, no transparency. Best for older phones.")
                 }
                 "Profiles" -> {
@@ -283,8 +293,8 @@ private fun Preview(s: LauncherSettings, modifier: Modifier) {
     Column(
         modifier
             .fillMaxWidth()
-            .background(colors.background)
-            .border(2.dp, colors.borderStrong)
+            .softInset(RoundedCornerShape(SLTheme.shapes.cornerMedium), softStyle(colors.background))
+            .border(1.dp, colors.borderStrong, RoundedCornerShape(SLTheme.shapes.cornerMedium))
             .padding(12.dp)
             .semantics { contentDescription = "Preview: ${s.homeColumns} columns, ${s.themeMode.name.lowercase()} theme" },
         verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -300,6 +310,6 @@ private fun Preview(s: LauncherSettings, modifier: Modifier) {
                 }
             }
         }
-        if (s.dockEnabled) Box(Modifier.fillMaxWidth().height(20.dp).background(colors.surface).border(1.dp, colors.border))
+        if (s.dockEnabled) Box(Modifier.fillMaxWidth().height(20.dp).softRaised(CircleShape, softStyle(colors.surface, 2.dp)))
     }
 }

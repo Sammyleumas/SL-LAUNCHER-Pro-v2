@@ -55,6 +55,9 @@ import com.sllauncher.core.designsystem.theme.SLTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.sllauncher.core.designsystem.component.softRaised
+import com.sllauncher.core.designsystem.component.softStyle
 
 /** Text shadow that keeps labels readable over bright wallpapers. */
 val WallpaperTextShadow = Shadow(color = Color(0x99000000), offset = Offset(0f, 2f), blurRadius = 6f)
@@ -102,7 +105,7 @@ fun HomePageGrid(
                         .offset(cellW * (cell % grid.columns), cellH * (cell / grid.columns))
                         .size(cellW, cellH)
                         .padding(4.dp)
-                        .border(1.dp, SLTheme.colors.accentIndicator.copy(alpha = 0.6f))
+                        .border(1.dp, SLTheme.colors.accentIndicator.copy(alpha = 0.6f), RoundedCornerShape(SLTheme.shapes.cornerSmall))
                         .clickable(onClickLabel = "Place here") { onPlaceMoving(cell) },
                 )
             }
@@ -259,8 +262,7 @@ fun FolderIcon(folder: FolderTile, size: Dp) {
     Box(
         Modifier
             .size(size)
-            .background(SLTheme.colors.surface.copy(alpha = 0.9f))
-            .border(SLTheme.shapes.borderWidth, SLTheme.colors.borderStrong)
+            .softRaised(RoundedCornerShape(SLTheme.shapes.cornerSmall), softStyle(SLTheme.colors.surface.copy(alpha = 0.94f), 3.dp))
             .padding(3.dp),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -287,7 +289,7 @@ fun WidgetView(tile: WidgetTile, width: Dp, height: Dp) {
     )
 }
 
-/** Page dots: the current page is a yellow bar. */
+/** Page dots: the current page is an accent pill. */
 @Composable
 fun PageIndicator(count: Int, current: Int, modifier: Modifier = Modifier) {
     if (count <= 1) return
@@ -300,7 +302,7 @@ fun PageIndicator(count: Int, current: Int, modifier: Modifier = Modifier) {
             Box(
                 Modifier
                     .size(width = if (index == current) 16.dp else 6.dp, height = 6.dp)
-                    .background(if (index == current) SLTheme.colors.accentIndicator else Color(0x99F5F1E8)),
+                    .background(if (index == current) SLTheme.colors.accentIndicator else Color(0x99F5F1E8), androidx.compose.foundation.shape.CircleShape),
             )
         }
     }
@@ -318,8 +320,7 @@ fun Dock(
     Row(
         modifier
             .fillMaxWidth()
-            .background(SLTheme.colors.surface.copy(alpha = 0.72f))
-            .border(SLTheme.shapes.borderWidth, SLTheme.colors.border)
+            .softRaised(RoundedCornerShape(SLTheme.shapes.cornerLarge), softStyle(SLTheme.colors.surface.copy(alpha = 0.9f)))
             .padding(vertical = 10.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
