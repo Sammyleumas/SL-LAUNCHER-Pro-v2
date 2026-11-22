@@ -1,17 +1,17 @@
 # Google Play store listing (draft)
 
-**App name:** SL Launcher
+**App name:** SL Launcher Pro
 
 **Short description (80 characters max):**
 Bold home screen with a floating app drawer, SL assistant and Dynamic Island.
 
 **Full description:**
 
-SL Launcher turns your home screen into a fast, focused workspace with a bold neo-brutalist look.
+SL Launcher Pro turns your home screen into a calm, focused workspace with a soft, tactile look. Every feature is free: no ads, no account, no in-app purchases.
 
 **Floating app drawer.** Swipe up for a clean drawer that floats over your wallpaper. Search instantly, browse by category (Social, Media, Tools, Games, Productivity, Education, Finance or your own), keep favourites close and hide apps you don't need to see.
 
-**SL assistant.** Tap the yellow SL button and speak or type: "open WhatsApp", "set a timer for ten minutes", "play my music", "read the latest news", "make my home screen minimal". SL listens only when you tap it.
+**SL assistant.** Tap the round SL button and speak or type: "open WhatsApp", "set a timer for ten minutes", "play my music", "read the latest news", "make my home screen minimal". SL listens only when you tap it.
 
 **Dynamic Island.** Music, calls, messages, timers, downloads and charging appear live at the top of your home screen. Reply to messages from apps that support quick replies without leaving home.
 
@@ -43,7 +43,7 @@ Capture them from a real phone or an emulator using the release build, at 1080×
 
 ## Feature graphic (1024×500)
 
-The SL mark on `#090909` with the tagline "Your home. Your rules." in Space Grotesk, with yellow `#FFD400` used sparingly.
+The rounded SL mark on the soft background `#E6E9EF`, with the tagline "Your home. Softly yours." in Nunito and the blue accent `#3A55D9`.
 
 ## Data safety answers (match the current code)
 

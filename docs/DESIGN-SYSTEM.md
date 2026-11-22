@@ -24,7 +24,9 @@ Module: `core/designsystem`. Every screen wraps its content in `SLTheme { }` and
 
 **Why `borderStrong` exists:** the brand border `#383838` measures only 1.70:1 against `#090909`. Accessibility guidelines (WCAG 1.4.11) need 3:1 for control boundaries, so input fields, switches, chips and similar controls use `#737373`. Measured ratios: 4.20 on `#090909`, 3.85 on `#151515`, 3.23 on `#252525`, and 4.21, 3.77 and 3.34 on the three paper surfaces. `#383838` stays the colour of decorative lines and shadows.
 
-**Yellow discipline:** yellow marks what is active, important or SL. Use it for the selected chip, the primary action and the assistant, not for every heading. In the light palette yellow is never text or a thin line (1.27:1 on paper); use `accentIndicator` there.
+> Version 2 note: SL Launcher Pro replaced the neo-brutalist tokens below with the soft UI (neumorphism) system described at the end of this file. The component list still applies.
+
+**Accent discipline (v1 wording: yellow):** the accent marks what is active, important or SL. Use it for the selected chip, the primary action and the assistant, not for every heading. In the light palette yellow is never text or a thin line (1.27:1 on paper); use `accentIndicator` there.
 
 ## Typography
 
@@ -95,3 +97,24 @@ The panel is always at least 16 dp inside the area between the system bars, so w
 3. Every icon-only control has a `contentDescription`.
 4. Animations go through `SLTheme.motion` so reduced motion keeps working.
 5. Layouts adapt by window size (`currentWindowWidthClass()`), never by phone model.
+
+
+## Version 2: soft UI (neumorphism)
+
+| Token | Light soft | Dark soft |
+|---|---|---|
+| Background and raised surfaces | `#E6E9EF` | `#23262D` |
+| Pressed-in wells | `#DCE0E8` | `#2B2F37` |
+| Text | `#2D3142` (11.0:1) | `#E8EAF0` (12.6:1) |
+| Secondary text | `#4A5068` (6.4:1) | `#A9AFBF` (6.6:1) |
+| Control outline | `#7A8092` (3.3:1) | `#7A8092` (3.6:1) |
+| Shadow / highlight | `#B8BEC9` / `#FFFFFF` | `#16181D` / `#30343D` |
+| Accent (default blue) | `#3A55D9`, white text | `#8FA2FF`, dark text |
+
+Five accents, all free: blue, teal, coral, purple and green, each with a deep tone for the light theme and a pale tone for the dark theme. Theme mode: Light, Dark or Auto.
+
+- **Shapes:** 14, 22 and 30 dp corners; pills and circles for chips, switches, sliders and the assistant button.
+- **Depth:** `Modifier.softRaised` draws a highlight to the top-left and a shade to the bottom-right; `Modifier.softInset` draws the reverse inside the shape. Blurred shadows on Android 9+; a flat offset shade on Android 8 and in low-performance mode.
+- **Accessibility fixes over classic neumorphism:** every interactive control keeps a 1 dp outline that meets 3:1, text meets 4.5:1, selected states change colour and depth, and pressed states are visible.
+- **Type:** Nunito (variable, SIL OFL) for all text. Sentence-case labels.
+- **Icons:** optional soft plate behind each app icon; icon shape setting (system, circle, squircle, square).

@@ -4,9 +4,9 @@
 
 Every push to the development branch publishes the newest test build:
 
-**https://github.com/Sammyleumas/ES-EL-LAUNCHER-/releases/tag/sl-launcher-latest** → `SL-Launcher-test.apk`
+**https://github.com/Sammyleumas/SL-LAUNCHER-Pro-v2/releases/tag/sl-launcher-pro-latest** → `SL-Launcher-Pro-test.apk`
 
-It is a **debug build**. It installs as "SL Launcher" next to any Play version (package `com.sllauncher.app.debug`) and includes the "SL Catalogue" design app. Do not distribute it to the public.
+It is a **debug build**. It installs as "SL Launcher" next to any Play version (package `com.sllauncher.pro.debug`) and includes the "SL Catalogue" design app. Do not distribute it to the public.
 
 ## 1. Create your upload key (once, on your computer)
 
@@ -40,7 +40,7 @@ In GitHub, open **Settings › Secrets and variables › Actions** and add:
 | `SL_KEY_ALIAS` | `sl-upload` |
 | `SL_KEY_PASSWORD` | Key password |
 
-The next CI run produces a signed `app-release.aab` (in the `sl-launcher-release` artifact) and adds `SL-Launcher-release-signed.apk` to the test release.
+The next CI run produces a signed `app-release.aab` (in the `sl-launcher-release` artifact) and adds `SL-Launcher-Pro-release-signed.apk` to the test release.
 
 ## 3. Versions
 
@@ -49,7 +49,7 @@ The next CI run produces a signed `app-release.aab` (in the `sl-launcher-release
 
 ## 4. Before the first Play upload
 
-- [ ] Confirm the package name `com.sllauncher.app`. It can never change afterwards.
+- [ ] Confirm the package name `com.sllauncher.pro`. It can never change afterwards.
 - [ ] Final launcher icon and feature graphic (the current icon is a placeholder mark).
 - [ ] Re-check Google Play's current target API requirement (`targetSdk` is 36 today).
 - [ ] News licensing settled (see `NEWS-SOURCES.md`).

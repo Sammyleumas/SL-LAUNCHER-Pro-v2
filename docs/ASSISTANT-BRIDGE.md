@@ -4,7 +4,7 @@ How your existing SL assistant app can control SL Launcher. The SL app's source 
 
 ## Security
 
-- **Service:** `com.sllauncher.app.assistant.AssistantBridgeService` (exported).
+- **Service:** `com.sllauncher.pro.assistant.AssistantBridgeService` (exported).
 - **Required permission:** `com.sllauncher.permission.EXECUTE_LAUNCHER_ACTIONS`, protection level `signature`.
 - **Who can call it:** only an app **signed with the same key** as SL Launcher. Sign the SL app with the same upload/release key, and declare `<uses-permission android:name="com.sllauncher.permission.EXECUTE_LAUNCHER_ACTIONS"/>` in its manifest.
 - **Validation:** every parameter is checked (types, ranges, lengths) before anything runs. Unknown actions are rejected.
@@ -12,7 +12,7 @@ How your existing SL assistant app can control SL Launcher. The SL app's source 
 
 ## Protocol (Android Messenger)
 
-1. Bind to the service: `Intent().setClassName("com.sllauncher.app", "com.sllauncher.app.assistant.AssistantBridgeService")`.
+1. Bind to the service: `Intent().setClassName("com.sllauncher.pro", "com.sllauncher.pro.assistant.AssistantBridgeService")`.
 2. Send a `Message` with:
    - `what = 1`
    - `data = Bundle { "action": String, "params": Bundle<String, String> }`

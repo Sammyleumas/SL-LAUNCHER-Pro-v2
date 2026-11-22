@@ -83,7 +83,7 @@ class PrivacyViewModel @Inject constructor(
     fun openLockScreenSettings() {
         val intents = listOf(
             android.content.Intent("android.settings.LOCK_SCREEN_SETTINGS"),
-            android.content.Intent(android.provider.Settings.ACTION_NOTIFICATION_SETTINGS),
+            android.content.Intent("android.settings.NOTIFICATION_SETTINGS"),
             android.content.Intent(android.provider.Settings.ACTION_SECURITY_SETTINGS),
         )
         for (intent in intents) {

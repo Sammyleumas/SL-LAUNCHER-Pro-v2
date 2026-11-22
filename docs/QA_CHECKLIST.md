@@ -97,9 +97,9 @@ Watch for these OEM quirks:
 Run on the entry-level phone, release build:
 
 ```bash
-adb shell am start -W -n com.sllauncher.app/.MainActivity               # cold start: record TotalTime
-adb shell dumpsys gfxinfo com.sllauncher.app reset; (scroll the drawer 10 s); adb shell dumpsys gfxinfo com.sllauncher.app   # janky frames %
-adb shell dumpsys meminfo com.sllauncher.app | head -20                   # TOTAL PSS
+adb shell am start -W -n com.sllauncher.pro/.MainActivity               # cold start: record TotalTime
+adb shell dumpsys gfxinfo com.sllauncher.pro reset; (scroll the drawer 10 s); adb shell dumpsys gfxinfo com.sllauncher.pro   # janky frames %
+adb shell dumpsys meminfo com.sllauncher.pro | head -20                   # TOTAL PSS
 ```
 
 | Metric | Target (entry-level) | Measured |
