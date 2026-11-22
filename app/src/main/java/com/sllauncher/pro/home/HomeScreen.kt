@@ -100,6 +100,7 @@ fun HomeRoute(
     var overlay by rememberSaveable { mutableStateOf(Overlay.None) }
     var drawerView by rememberSaveable { mutableStateOf(DrawerView.All) }
     var searchSeed by rememberSaveable { mutableStateOf("") }
+    var showWallpapers by remember { mutableStateOf(false) }
     var openFolderId by rememberSaveable { mutableLongStateOf(-1L) }
     var menuTile by remember { mutableStateOf<HomeTile?>(null) }
     var menuInDock by remember { mutableStateOf(false) }
@@ -265,9 +266,13 @@ fun HomeRoute(
     renameFolder?.let { folder ->
         RenameFolderSheet(folder, onRename = { viewModel.renameFolder(folder.item.id, it) }, onDismiss = { renameFolder = null })
     }
+    if (showWallpapers) {
+        com.sllauncher.pro.settings.WallpaperGallerySheet(onDismiss = { showWallpapers = false })
+    }
     if (homeMenu) {
         HomeMenuSheet(
             onWallpaper = { context.startSafely(SystemIntents.wallpaperPicker()) },
+            onSlWallpapers = { showWallpapers = true },
             onWidgets = { onNavigate(WidgetPickerDestination) },
             onAddPage = { viewModel.addPage() },
             onRemovePage = { viewModel.removeLastPage() },

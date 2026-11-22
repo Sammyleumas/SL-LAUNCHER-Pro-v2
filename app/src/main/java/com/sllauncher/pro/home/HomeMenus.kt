@@ -105,6 +105,7 @@ fun ItemMenuSheet(tile: HomeTile, inDock: Boolean, grid: GridSpec, actions: Item
 @Composable
 fun HomeMenuSheet(
     onWallpaper: () -> Unit,
+    onSlWallpapers: () -> Unit,
     onWidgets: () -> Unit,
     onAddPage: () -> Unit,
     onRemovePage: () -> Unit,
@@ -114,7 +115,8 @@ fun HomeMenuSheet(
 ) {
     fun run(action: () -> Unit) { action(); onDismiss() }
     SLBottomSheet(onDismissRequest = onDismiss, title = "Home screen") {
-        SLNavigationRow(title = "Wallpaper", subtitle = "Opens Android's wallpaper picker", onClick = { run(onWallpaper) })
+        SLNavigationRow(title = "SL wallpapers", subtitle = "Soft wallpapers made for SL Pro", onClick = { run(onSlWallpapers) })
+        SLNavigationRow(title = "Other wallpapers", subtitle = "Your photos and Android's wallpaper picker", onClick = { run(onWallpaper) })
         SLNavigationRow(title = "Widgets", onClick = { run(onWidgets) })
         SLNavigationRow(title = "Add page", onClick = { run(onAddPage) })
         SLNavigationRow(title = "Remove last page", subtitle = "Only when it is empty", onClick = { run(onRemovePage) })

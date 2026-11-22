@@ -40,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
@@ -158,12 +159,12 @@ private fun SetupPill(onClick: () -> Unit) {
             .border(1.5.dp, SLTheme.colors.accent, CircleShape)
             .pointerInput(Unit) { detectTapGestures { onClick() } }
             .semantics { onClick(label = "Turn on notification access") { onClick(); true } }
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Box(Modifier.size(8.dp).background(SLTheme.colors.accent))
-        Text("Turn on Dynamic Island", style = SLTheme.typography.label, color = IslandText)
+        Box(Modifier.size(6.dp).background(SLTheme.colors.accent, CircleShape))
+        Text("Turn on Dynamic Island", style = SLTheme.typography.caption, color = IslandText)
     }
 }
 
@@ -183,8 +184,8 @@ private fun CompactPill(
     val summary = compactSummary(activity, now, hideContent)
     Row(
         Modifier
-            .widthIn(min = 160.dp, max = 360.dp)
-            .heightIn(min = 40.dp)
+            .widthIn(min = 120.dp, max = 260.dp)
+            .heightIn(min = 32.dp)
             .background(IslandBlack, CircleShape)
             .pointerInput(activity.id) { detectTapGestures(onTap = { onTap() }, onLongPress = { onLongPress() }) }
             .pointerInput(count) {
@@ -202,7 +203,7 @@ private fun CompactPill(
                     if (count > 1) CustomAccessibilityAction("Next activity") { onSwipe(1); true } else null,
                 )
             }
-            .padding(horizontal = 10.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -227,23 +228,23 @@ private fun LeadingMark(activity: IslandActivity, appKeyFor: (String) -> com.sll
     val key = pkg?.let(appKeyFor)
     when {
         activity is IslandActivity.Music && activity.nowPlaying.art != null ->
-            Image(activity.nowPlaying.art.asImageBitmap(), contentDescription = null, modifier = Modifier.size(24.dp))
-        key != null -> AppIcon(key, pkg.orEmpty(), 24.dp)
-        else -> Box(Modifier.size(10.dp).background(SLTheme.colors.accent))
+            Image(activity.nowPlaying.art.asImageBitmap(), contentDescription = null, modifier = Modifier.size(20.dp).clip(CircleShape))
+        key != null -> AppIcon(key, pkg.orEmpty(), 20.dp)
+        else -> Box(Modifier.size(8.dp).background(SLTheme.colors.accent, CircleShape))
     }
 }
 
 @Composable
 private fun TrailingMark(activity: IslandActivity, now: Long) {
     when (activity) {
-        is IslandActivity.Charging -> Text("${activity.battery.percent}%", style = SLTheme.typography.label, color = if (activity.battery.low) SLTheme.colors.error else SLTheme.colors.accent)
-        is IslandActivity.Focus -> Text(mmss(activity.session.remainingMs(now)), style = SLTheme.typography.label, color = SLTheme.colors.accent)
-        is IslandActivity.Message -> if (activity.unread > 1) Text("${activity.unread}", style = SLTheme.typography.label, color = SLTheme.colors.accent)
+        is IslandActivity.Charging -> Text("${activity.battery.percent}%", style = SLTheme.typography.caption, color = if (activity.battery.low) SLTheme.colors.error else SLTheme.colors.accent)
+        is IslandActivity.Focus -> Text(mmss(activity.session.remainingMs(now)), style = SLTheme.typography.caption, color = SLTheme.colors.accent)
+        is IslandActivity.Message -> if (activity.unread > 1) Text("${activity.unread}", style = SLTheme.typography.caption, color = SLTheme.colors.accent)
         is IslandActivity.Progress -> if (!activity.notification.progressIndeterminate && activity.notification.progressMax > 0) {
-            Text("${activity.notification.progress * 100 / activity.notification.progressMax}%", style = SLTheme.typography.label, color = SLTheme.colors.accent)
+            Text("${activity.notification.progress * 100 / activity.notification.progressMax}%", style = SLTheme.typography.caption, color = SLTheme.colors.accent)
         }
-        is IslandActivity.Music -> Box(Modifier.size(width = 4.dp, height = if (activity.nowPlaying.isPlaying) 14.dp else 6.dp).background(SLTheme.colors.accent))
-        else -> Box(Modifier.size(8.dp).background(SLTheme.colors.accent))
+        is IslandActivity.Music -> Box(Modifier.size(width = 3.dp, height = if (activity.nowPlaying.isPlaying) 12.dp else 5.dp).background(SLTheme.colors.accent, CircleShape))
+        else -> Box(Modifier.size(6.dp).background(SLTheme.colors.accent, CircleShape))
     }
 }
 
@@ -275,16 +276,16 @@ private fun Expanded(activity: IslandActivity, now: Long, state: IslandUiState, 
         Modifier
             .padding(top = 6.dp)
             .fillMaxWidth()
-            .widthIn(max = 480.dp)
-            .background(IslandBlack, RoundedCornerShape(28.dp))
-            .padding(14.dp),
+            .widthIn(max = 400.dp)
+            .background(IslandBlack, RoundedCornerShape(26.dp))
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         when (activity) {
             is IslandActivity.Music -> {
                 val np = activity.nowPlaying
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    np.art?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(56.dp)) }
+                    np.art?.let { Image(it.asImageBitmap(), contentDescription = null, modifier = Modifier.size(48.dp).clip(RoundedCornerShape(12.dp))) }
                     Column(Modifier.weight(1f)) {
                         Text(np.title, style = SLTheme.typography.title, color = IslandText, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(listOfNotNull(np.artist, np.appLabel).joinToString(" · "), style = SLTheme.typography.caption, color = IslandMuted, maxLines = 1)

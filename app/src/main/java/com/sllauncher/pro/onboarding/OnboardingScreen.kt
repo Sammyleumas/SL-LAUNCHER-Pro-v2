@@ -56,6 +56,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
+    @param:dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
     private val settingsRepository: SettingsRepository,
     private val homeRole: HomeRoleRepository,
     val checker: DefaultHomeChecker,
@@ -66,8 +67,15 @@ class OnboardingViewModel @Inject constructor(
 
     fun refreshRole() = homeRole.refresh()
     fun update(transform: (LauncherSettings) -> LauncherSettings) = viewModelScope.launch { settingsRepository.update(transform) }
+    /** Set during onboarding: apply SL's default wallpaper when setup finishes. */
+    val useSlWallpaper = kotlinx.coroutines.flow.MutableStateFlow(true)
+
     fun finish(onDone: () -> Unit) = viewModelScope.launch {
         settingsRepository.update { it.copy(onboardingComplete = true) }
+        if (useSlWallpaper.value) {
+            val dark = settingsRepository.current.themeMode == com.sllauncher.pro.data.settings.ThemeMode.Dark
+            com.sllauncher.pro.settings.applySoftWallpaper(context, com.sllauncher.pro.settings.defaultSoftWallpaper(dark))
+        }
         onDone()
     }
 }
@@ -159,6 +167,13 @@ fun OnboardingRoute(onDone: () -> Unit, viewModel: OnboardingViewModel = hiltVie
                             options = listOf(SLSegment("Light"), SLSegment("Dark"), SLSegment("Auto")),
                             selectedIndex = settings.themeMode.ordinal,
                             onSelect = { i -> viewModel.update { it.copy(themeMode = ThemeMode.entries[i]) } },
+                        )
+                        val useWallpaper by viewModel.useSlWallpaper.collectAsStateWithLifecycle()
+                        SLSwitchRow(
+                            title = "Use the SL Pro wallpaper",
+                            subtitle = "A soft wallpaper that matches the theme. Change it any time.",
+                            checked = useWallpaper,
+                            onCheckedChange = { viewModel.useSlWallpaper.value = it },
                         )
                         SLSwitchRow(title = "Show app names", checked = settings.homeShowLabels, onCheckedChange = { on -> viewModel.update { it.copy(homeShowLabels = on, drawerShowLabels = on) } })
                         SLSwitchRow(

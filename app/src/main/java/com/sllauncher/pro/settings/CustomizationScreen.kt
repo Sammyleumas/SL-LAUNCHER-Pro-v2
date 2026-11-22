@@ -85,19 +85,8 @@ class CustomizationViewModel @Inject constructor(
     private val iconPacks: IconPackManager,
     private val icons: AppIconLoader,
     private val bus: UiCommandBus,
-    @param:dagger.hilt.android.qualifiers.ApplicationContext private val appContext: android.content.Context,
 ) : ViewModel() {
     val state: StateFlow<LauncherSettings> = settings.settings.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), settings.current)
-
-    fun applyWallpaper(wallpaper: SoftWallpaper) = viewModelScope.launch {
-        val ok = applySoftWallpaper(appContext, wallpaper)
-        bus.send(UiCommand.ShowMessage(if (ok) "${wallpaper.name} wallpaper set." else "Couldn't set the wallpaper."))
-    }
-
-    fun setDailyWallpaper(on: Boolean) = viewModelScope.launch {
-        settings.update { it.copy(dailySoftWallpaper = on) }
-        DailyWallpaperWorker.schedule(appContext, on)
-    }
 
     val savedProfiles = profiles.saved.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -241,7 +230,7 @@ fun CustomizationRoute(onBack: () -> Unit, viewModel: CustomizationViewModel = h
                         modifier = Modifier.padding(horizontal = 16.dp),
                     )
                     SLNavigationRow("Icon pack", { showPacks = true }, value = s.iconPackPackage ?: "System icons")
-                    SLNavigationRow("Soft wallpapers", { showWallpapers = true }, subtitle = "Built-in wallpapers made for the soft look")
+                    SLNavigationRow("SL wallpapers", { showWallpapers = true }, subtitle = "12 soft wallpapers made for SL Pro")
                     SLSectionHeader("Icon shape", Modifier.padding(16.dp, 8.dp))
                     SLSegmentedControl(
                         options = IconShape.entries.map { SLSegment(it.name) },
@@ -275,17 +264,7 @@ fun CustomizationRoute(onBack: () -> Unit, viewModel: CustomizationViewModel = h
     }
 
     if (showWallpapers) {
-        SLBottomSheet(onDismissRequest = { showWallpapers = false }, title = "Soft wallpapers") {
-            SoftWallpapers.forEach { w ->
-                SLNavigationRow(w.name, { viewModel.applyWallpaper(w); showWallpapers = false })
-            }
-            SLSwitchRow(
-                title = "Change daily",
-                subtitle = "A different soft wallpaper each day",
-                checked = s.dailySoftWallpaper,
-                onCheckedChange = { on -> viewModel.setDailyWallpaper(on) },
-            )
-        }
+        WallpaperGallerySheet(onDismiss = { showWallpapers = false })
     }
     if (showPacks) {
         val packs = remember { viewModel.packs() }
