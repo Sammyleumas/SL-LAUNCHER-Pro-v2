@@ -1,0 +1,27 @@
+# Gradle / build outputs
+.gradle/
+build/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local SDK path and machine-specific settings (never commit)
+local.properties
+
+# IDEs
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+# Signing material and secrets (never commit)
+*.jks
+*.keystore
+keystore.properties
+secrets.properties
+google-services.json
+
+# Logs
+*.log

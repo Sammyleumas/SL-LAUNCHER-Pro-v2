@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SL Launcher Pro</string>
+
+    <!-- Home -->
+    <string name="home_not_default_title">SL is not your home app yet</string>
+    <string name="home_not_default_action">Set up</string>
+
+    <!-- Default launcher setup -->
+    <string name="setup_title">Make SL Launcher Pro your home screen</string>
+    <string name="setup_body">Android lets you choose which app opens when you press the Home button. SL Launcher Pro only works as your home screen after you select it. You can switch back to your previous launcher at any time in Android Settings.</string>
+    <string name="setup_status_default">SL Launcher Pro is your default home app.</string>
+    <string name="setup_status_not_default">Another app is currently your default home app.</string>
+    <string name="setup_action_request">Set as default home app</string>
+    <string name="setup_action_settings">Open Android home settings</string>
+    <string name="setup_settings_hint">If no prompt appears, your phone may have hidden it. Open Android home settings and pick SL Launcher Pro manually.</string>
+    <string name="setup_action_done">Back to home</string>
+    <string name="setup_settings_unavailable">This device does not expose a default-apps screen. Open Settings › Apps › Default apps manually.</string>
+</resources>

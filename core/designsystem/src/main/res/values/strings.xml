@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Accessibility labels used by design-system components (read by TalkBack). -->
+    <string name="sl_ds_search_clear">Clear search</string>
+    <string name="sl_ds_panel_handle">Drag down to close</string>
+    <string name="sl_ds_panel_close">Close</string>
+    <string name="sl_ds_loading">Loading</string>
+    <string name="sl_ds_retry">Try again</string>
+    <string name="sl_ds_media_previous">Previous track</string>
+    <string name="sl_ds_media_next">Next track</string>
+    <string name="sl_ds_media_play">Play</string>
+    <string name="sl_ds_media_pause">Pause</string>
+    <string name="sl_ds_assistant_idle">Talk to SL</string>
+    <string name="sl_ds_assistant_listening">SL is listening. Tap to stop.</string>
+    <string name="sl_ds_assistant_processing">SL is thinking</string>
+    <string name="sl_ds_assistant_speaking">SL is speaking. Tap to interrupt.</string>
+    <string name="sl_ds_badge_count">%1$d new</string>
+    <string name="sl_ds_switch_on">On</string>
+    <string name="sl_ds_switch_off">Off</string>
+</resources>

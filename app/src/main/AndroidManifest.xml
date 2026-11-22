@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Permissions. Runtime ("dangerous") permissions are requested only when the
+        user turns on or first uses the feature that needs them; see docs/PERMISSIONS.md.
+    -->
+    <!-- Contact search (runtime, asked when the user enables it in search). -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <!-- Local music library and music search (runtime, asked on first use). -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- Lets "Uninstall" open Android's own uninstall confirmation (normal permission). -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+    <!-- Hands timers and alarms to the clock app via AlarmClock intents (normal permission). -->
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <!-- News headlines and images only (normal permission). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Talking to SL; asked the first time the user taps the SL button (runtime). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Reminder and focus-timer notifications; asked when the user first sets one (runtime, Android 13+). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Local music playback as a media foreground service while playing. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- Brightness slider; the user grants "Modify system settings" separately. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <!-- Today's events in the daily overview; asked when the user enables it (runtime). -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <!-- Bluetooth on/off state in Device info (Android 11 and older only). -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+
+    <!-- Only apps signed with SL Launcher's key (the SL assistant app) can run launcher actions. -->
+    <permission
+        android:name="com.sllauncher.pro.permission.EXECUTE_LAUNCHER_ACTIONS"
+        android:label="Run SL Launcher Pro actions"
+        android:protectionLevel="signature" />
+
+    <!-- Package visibility: only what a launcher needs, no QUERY_ALL_PACKAGES. -->
+    <queries>
+        <!-- Launchable apps for the drawer and home screen. -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- Icon packs (ADW / Nova format). -->
+        <intent><action android:name="org.adw.launcher.THEMES" /></intent>
+        <intent><action android:name="com.novalauncher.THEME" /></intent>
+        <!-- Default dock apps on first run. -->
+        <intent><action android:name="android.intent.action.DIAL" /></intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.APP_MESSAGING" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.APP_BROWSER" />
+        </intent>
+        <intent><action android:name="android.media.action.STILL_IMAGE_CAMERA" /></intent>
+        <!-- On-device speech recognition and text-to-speech for the SL assistant. -->
+        <intent><action android:name="android.speech.RecognitionService" /></intent>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+        <!-- Equalizer apps for the music player. -->
+        <intent><action android:name="android.media.action.DISPLAY_AUDIO_EFFECT_CONTROL_PANEL" /></intent>
+        <!-- Web links from news and search. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".SLLauncherApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.SLLauncher">
+
+        <!--
+            MainActivity is the launcher's home screen.
+
+            launchMode=singleTask   : one home instance; pressing Home re-delivers
+                                      the intent to onNewIntent instead of stacking.
+            clearTaskOnLaunch       : returning home always shows the home screen.
+            stateNotNeeded          : the system may restart the launcher without
+                                      saved state (standard for launchers).
+            excludeFromRecents      : the home screen is not shown in Recents.
+            resizeableActivity      : supports split-screen / foldables / tablets.
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:stateNotNeeded="true"
+            android:excludeFromRecents="true"
+            android:resizeableActivity="true"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.SLLauncher.Home">
+
+            <!-- Makes SL Launcher eligible to be chosen as the default Home app. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Also listed in the app drawer so it can be opened before it is the default. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            Receives "Add to home screen" requests from other apps (pinned shortcuts).
+            Android sends these to the default launcher; requests are validated with
+            LauncherApps.getPinItemRequest, so forged intents are ignored.
+        -->
+        <activity
+            android:name=".shortcuts.AddShortcutActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.SLLauncher.Translucent">
+            <intent-filter>
+                <action android:name="android.content.pm.action.CONFIRM_PIN_SHORTCUT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Notification access (the user turns it on in Android settings). -->
+        <service
+            android:name=".notifications.SLNotificationListener"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Local music playback with a system media session. -->
+        <service
+            android:name=".music.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
+
+        <!-- SL assistant app bridge, signature-protected. -->
+        <service
+            android:name=".assistant.AssistantBridgeService"
+            android:exported="true"
+            android:permission="com.sllauncher.pro.permission.EXECUTE_LAUNCHER_ACTIONS" />
+
+        <!-- Task reminders and focus-timer completion (sent only by SL's own alarms). -->
+        <receiver android:name=".productivity.ReminderReceiver" android:exported="false" />
+
+        <!-- WorkManager starts on demand with Hilt's worker factory, not at app start. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+    </application>
+
+</manifest>

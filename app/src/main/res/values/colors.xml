@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Only colours needed by XML resources (window, launcher icon). UI colours live in SLTheme. -->
+    <color name="sl_background">#FF090909</color>
+    <color name="sl_accent">#FFFFD400</color>
+</resources>

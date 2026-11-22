@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base window theme. Compose draws all UI; this only controls the window. -->
+    <style name="Theme.SLLauncher" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/sl_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+    <!--
+        Home theme: the system wallpaper is drawn behind the window, so the
+        launcher's home screen shows the user's wallpaper. The window background
+        must be transparent for this to work.
+    -->
+    <style name="Theme.SLLauncher.Home">
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">false</item>
+    </style>
+
+    <!-- Transparent window for confirmation dialogs started by other apps. -->
+    <style name="Theme.SLLauncher.Translucent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+</resources>

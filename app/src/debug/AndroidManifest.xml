@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug-only additions, merged into the debug build's manifest.
+    Release builds never include this file or the catalogue activity.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- Second app-list icon, "SL Catalogue", for reviewing every design-system component. -->
+        <activity
+            android:name=".catalogue.DesignCatalogueActivity"
+            android:exported="true"
+            android:label="@string/catalogue_label"
+            android:taskAffinity="com.sllauncher.pro.catalogue"
+            android:theme="@style/Theme.SLLauncher">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
