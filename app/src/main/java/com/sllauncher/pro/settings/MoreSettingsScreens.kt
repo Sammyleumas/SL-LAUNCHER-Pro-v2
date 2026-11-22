@@ -74,7 +74,7 @@ fun GesturesRoute(onBack: () -> Unit, viewModel: GeneralSettingsViewModel = hilt
 
             SLSectionHeader("Double-tap on the home screen")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                GestureAction.entries.forEach { a ->
+                GestureAction.entries.filter { it != GestureAction.SplitPanels }.forEach { a ->
                     SLChip(a.label, s.gestureDoubleTap == a, { viewModel.update { it.copy(gestureDoubleTap = a) } })
                 }
             }

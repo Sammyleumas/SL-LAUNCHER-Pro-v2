@@ -154,7 +154,7 @@ fun NotificationCenterRoute(onBack: () -> Unit, viewModel: NotificationCenterVie
 }
 
 @Composable
-private fun AccessCard(onOpenSettings: () -> Unit) {
+internal fun AccessCard(onOpenSettings: () -> Unit) {
     SLBlock(Modifier.padding(16.dp).fillMaxWidth(), shadow = true) {
         Text("Turn on notification access", style = SLTheme.typography.title, color = SLTheme.colors.textPrimary)
         Text(
@@ -169,7 +169,7 @@ private fun AccessCard(onOpenSettings: () -> Unit) {
 }
 
 @Composable
-private fun NotificationCard(n: SLNotification, hideContent: Boolean, viewModel: NotificationCenterViewModel) {
+internal fun NotificationCard(n: SLNotification, hideContent: Boolean, viewModel: NotificationCenterViewModel) {
     var replying by remember(n.key) { mutableStateOf(false) }
     var draft by remember(n.key) { mutableStateOf("") }
     var status by remember(n.key) { mutableStateOf<String?>(null) }

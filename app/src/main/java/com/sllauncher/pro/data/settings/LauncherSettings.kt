@@ -32,6 +32,10 @@ enum class IslandPosition { Center, Start }
 /** What a home-screen gesture does. */
 enum class GestureAction(val label: String) {
     None("Nothing"),
+    /** Swipe down only: left half opens notifications, right half opens the Control Center. */
+    SplitPanels("iOS style: left for notifications, right for controls"),
+    ControlCenter("Open the Control Center"),
+    NotificationsPanel("Open the notifications panel"),
     LockScreen("Lock the screen"),
     Notifications("Open the notification shade"),
     NotificationCenter("Open SL notifications"),
@@ -121,7 +125,7 @@ data class LauncherSettings(
 
     // Gestures (v2)
     val gestureDoubleTap: GestureAction = GestureAction.LockScreen,
-    val gestureSwipeDown: GestureAction = GestureAction.Notifications,
+    val gestureSwipeDown: GestureAction = GestureAction.SplitPanels,
 
     // News (v2)
     val customFeeds: List<CustomFeed> = emptyList(),

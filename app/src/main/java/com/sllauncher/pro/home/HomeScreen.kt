@@ -35,6 +35,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import com.sllauncher.pro.data.settings.GestureAction
+import com.sllauncher.pro.controlcenter.ControlCenterPanel
+import com.sllauncher.pro.controlcenter.HomePanel
+import com.sllauncher.pro.controlcenter.NotificationsPanel
+import com.sllauncher.pro.controlcenter.panelForSwipeStart
 import com.sllauncher.pro.gestures.SLAccessibilityService
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
@@ -70,7 +74,7 @@ import com.sllauncher.core.designsystem.component.softRaised
 import com.sllauncher.core.designsystem.component.softStyle
 import androidx.compose.ui.draw.clip
 
-private enum class Overlay { None, Drawer, Search, Folder }
+private enum class Overlay { None, Drawer, Search, Folder, ControlCenter, Notifications }
 
 /**
  * The launcher's home screen.
@@ -111,6 +115,8 @@ fun HomeRoute(
     fun runGesture(action: GestureAction) {
         when (action) {
             GestureAction.None -> Unit
+            GestureAction.SplitPanels, GestureAction.ControlCenter -> overlay = Overlay.ControlCenter
+            GestureAction.NotificationsPanel -> overlay = Overlay.Notifications
             GestureAction.LockScreen -> if (!SLAccessibilityService.lockScreen()) {
                 viewModel.showMessage(
                     if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.P) {
@@ -189,7 +195,17 @@ fun HomeRoute(
         onEmptyLongPress = { homeMenu = true },
         onEmptyDoubleTap = { runGesture(state.settings.gestureDoubleTap) },
         onSwipeUp = { drawerView = DrawerView.All; overlay = Overlay.Drawer },
-        onSwipeDown = { runGesture(state.settings.gestureSwipeDown) },
+        onSwipeDown = { startX, width ->
+            val action = state.settings.gestureSwipeDown
+            if (action == GestureAction.SplitPanels) {
+                overlay = when (panelForSwipeStart(startX, width)) {
+                    HomePanel.ControlCenter -> Overlay.ControlCenter
+                    HomePanel.Notifications -> Overlay.Notifications
+                }
+            } else {
+                runGesture(action)
+            }
+        },
         onOpenSearch = { searchSeed = ""; overlay = Overlay.Search },
         onOpenAssistant = viewModel::openAssistant,
         onOpenLauncherSetup = onOpenLauncherSetup,
@@ -206,6 +222,16 @@ fun HomeRoute(
         visible = overlay == Overlay.Search,
         initialQuery = searchSeed,
         onDismiss = { overlay = Overlay.None },
+    )
+    NotificationsPanel(
+        visible = overlay == Overlay.Notifications,
+        onDismiss = { overlay = Overlay.None },
+        onOpenAll = { onNavigate(NotificationCenterDestination) },
+    )
+    ControlCenterPanel(
+        visible = overlay == Overlay.ControlCenter,
+        onDismiss = { overlay = Overlay.None },
+        onOpenSlSettings = { onNavigate(com.sllauncher.pro.navigation.SettingsDestination) },
     )
     FolderPanel(
         folder = if (overlay == Overlay.Folder) state.folder(openFolderId) else null,
@@ -263,7 +289,7 @@ private fun HomeScreen(
     onEmptyLongPress: () -> Unit,
     onEmptyDoubleTap: () -> Unit,
     onSwipeUp: () -> Unit,
-    onSwipeDown: () -> Unit,
+    onSwipeDown: (startX: Float, width: Float) -> Unit,
     onOpenSearch: () -> Unit,
     onOpenAssistant: () -> Unit,
     onOpenLauncherSetup: () -> Unit,
@@ -271,6 +297,7 @@ private fun HomeScreen(
     val settings = state.settings
     val pagerState = rememberPagerState { state.pageCount }
     var dragTotal by remember { mutableStateOf(0f) }
+    var dragStartX by remember { mutableStateOf(0f) }
     val currentSwipeUp by androidx.compose.runtime.rememberUpdatedState(onSwipeUp)
     val currentSwipeDown by androidx.compose.runtime.rememberUpdatedState(onSwipeDown)
 
@@ -281,11 +308,11 @@ private fun HomeScreen(
             .safeDrawingPadding()
             .pointerInput(Unit) {
                 detectVerticalDragGestures(
-                    onDragStart = { dragTotal = 0f },
+                    onDragStart = { offset -> dragTotal = 0f; dragStartX = offset.x },
                     onDragEnd = {
                         when {
                             dragTotal < -120f -> currentSwipeUp()
-                            dragTotal > 160f -> currentSwipeDown()
+                            dragTotal > 160f -> currentSwipeDown(dragStartX, size.width.toFloat())
                         }
                     },
                 ) { _, amount -> dragTotal += amount }

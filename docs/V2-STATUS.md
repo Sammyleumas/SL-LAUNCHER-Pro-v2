@@ -38,6 +38,7 @@ There is no Premium tier, no locked feature, no in-app purchase and no ads. The 
 | Area | Status | Notes |
 |---|---|---|
 | Home screen, dock, folders, widgets, shortcuts | Done (v1, restyled) | |
+| Control Center and notifications panel (iOS style) | Done (new) | Swipe down on the right half of the home screen for the Control Center, or the left half for notifications. Control Center tiles: flashlight, Do Not Disturb, rotation lock, dark theme and focus switch directly. Wi-Fi, mobile data, Bluetooth, airplane mode, hotspot, battery and sound open Android's own panels, because Android doesn't let apps switch those. It also has brightness and volume sliders, a now-playing card and shortcuts. Both panels work on SL's home screen, not over other apps |
 | Gestures | Done (new) | Double-tap and swipe-down actions are configurable. Locking the screen and opening the notification shade use an accessibility service that the user turns on. It performs only those two actions. Lock needs Android 9+ |
 | Floating drawer | Done | New "Suggested for now" row learns from your own app launches on the phone, by time of day |
 | Search and commands | Done (v1) | |
